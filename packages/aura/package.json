@@ -1,0 +1,18 @@
+{
+  "name": "aura",
+  "type": "module",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "exports": {
+    "./aura": {
+      "types": "./src/aura.ts",
+      "default": "./dist/aura.js"
+    }
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "typescript": "latest"
+  }
+}
