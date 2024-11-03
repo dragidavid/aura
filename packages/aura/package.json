@@ -3,17 +3,18 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc"
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "lint": "tsc"
   },
   "exports": {
     "./client": {
-      "types": "./dist/client/index.d.ts",
-      "import": "./dist/client/index.js"
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js"
     },
     "./server": {
-      "types": "./dist/server/index.d.ts",
-      "import": "./dist/server/index.js"
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
     }
   },
   "dependencies": {
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18.2.0",
+    "tsup": "^8.3.5",
     "typescript": "latest"
   }
 }

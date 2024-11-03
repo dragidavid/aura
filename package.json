@@ -1,5 +1,7 @@
 {
   "name": "aura",
+  "version": "0.0.1",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "build": "turbo build",
@@ -10,6 +12,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.9",
     "@commitlint/cli": "^19.5.0",
     "@commitlint/config-conventional": "^19.5.0",
     "husky": "^9.1.6",
