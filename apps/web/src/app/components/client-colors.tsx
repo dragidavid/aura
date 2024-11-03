@@ -1,9 +1,9 @@
 "use client";
 
-import { useAura } from "aura"; // This will use the browser version
+import { extractAura } from "aura/client";
 
 export default function ClientColors({ imageUrl }: { imageUrl: string }) {
-  const { colors, isLoading, error } = useAura(imageUrl);
+  const { colors, isLoading, error } = extractAura(imageUrl);
 
   if (error) {
     return <div>Error: {error.message}</div>;

@@ -8,7 +8,7 @@ import { kMeansClustering } from "../core/kmeans";
  * Extracts dominant colors from an image using server-side processing with Sharp.
  * Uses a hybrid approach combining Median Cut and k-means clustering.
  */
-export async function extractColors(
+export async function extractAura(
   imageUrl: string,
   numColors: number = 6
 ): Promise<ColorInfo[]> {
@@ -53,3 +53,5 @@ export async function extractColors(
     }))
     .sort((a, b) => b.weight - a.weight);
 }
+
+export type { ColorInfo } from "../core/color";

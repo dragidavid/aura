@@ -1,7 +1,7 @@
-import { extractColors } from "aura"; // This will use the node version
+import { extractAura } from "aura/server";
 
 export default async function ServerColors({ imageUrl }: { imageUrl: string }) {
-  const colors = await extractColors(imageUrl);
+  const colors = await extractAura(imageUrl);
 
   return (
     <div className="flex justify-evenly gap-2">
