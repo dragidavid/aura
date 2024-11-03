@@ -2,7 +2,9 @@ import { Suspense } from "react";
 import Image from "next/image";
 
 import ImageRefresh from "@/app/components/image-refresh";
-import Colors from "@/app/components/colors";
+
+import ClientColors from "./client-colors";
+import ServerColors from "./server-colors";
 
 export default async function Images() {
   const imageId = Math.floor(Math.random() * 1000);
@@ -10,11 +12,17 @@ export default async function Images() {
 
   return (
     <div className="flex flex-col items-center justify-center gap-6">
-      <Colors imageUrl={imageUrl} />
+      <div className="flex flex-col gap-2">
+        <p>Client</p>
+        <ClientColors imageUrl={imageUrl} />
 
-      <div className="relative w-96 h-96 rounded-2xl overflow-hidden shadow-lg">
+        <p>Server</p>
+        <ServerColors imageUrl={imageUrl} />
+      </div>
+
+      <div className="relative h-96 w-96 overflow-hidden rounded-2xl shadow-lg">
         <Suspense
-          fallback={<div className="w-full h-full bg-white/5 animate-pulse" />}
+          fallback={<div className="h-full w-full animate-pulse bg-white/5" />}
         >
           <Image
             src={imageUrl}
