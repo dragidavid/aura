@@ -3,8 +3,8 @@ import Image from "next/image";
 
 import ImageRefresh from "@/app/components/image-refresh";
 
-import ClientColors from "./client-colors";
-import ServerColors from "./server-colors";
+import ClientColors from "@/app/components/client-colors";
+import ServerColors from "@/app/components/server-colors";
 
 export default async function Images() {
   const imageId = Math.floor(Math.random() * 1000);
