@@ -12,7 +12,8 @@
     "test": "echo \"No tests specified\" && exit 0",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky",
-    "release": "changeset version",
+    "version-packages": "changeset version",
+    "release": "pnpm aura:build && changeset publish",
     "pub:release": "cd packages/aura && pnpm pub:release"
   },
   "devDependencies": {
