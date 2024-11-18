@@ -6,13 +6,14 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "aura:build": "turbo build --filter=aura build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "test": "echo \"No tests specified\" && exit 0",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky",
     "release": "changeset version",
-    "aura:build": "turbo build --filter=aura build"
+    "pub:release": "cd packages/aura && pnpm pub:release"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",
