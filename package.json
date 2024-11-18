@@ -10,6 +10,7 @@
     "test": "echo \"No tests specified\" && exit 0",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky",
+    "release": "changeset version",
     "aura:build": "turbo build --filter=aura build"
   },
   "devDependencies": {
