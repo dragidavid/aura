@@ -1,6 +1,6 @@
 {
-  "name": "web",
-  "version": "0.1.2",
+  "name": "@drg/aura-web",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "aura": "workspace:*",
+    "@drg/aura": "workspace:*",
     "next": "15.0.2",
     "react": "19.0.0-rc-02c0e824-20241028",
     "react-dom": "19.0.0-rc-02c0e824-20241028",
