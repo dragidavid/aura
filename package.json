@@ -1,12 +1,12 @@
 {
-  "name": "@drg/aura",
+  "name": "aura",
   "version": "0.0.1",
   "license": "MIT",
   "type": "module",
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "aura:build": "turbo build --filter=@drg/aura build",
+    "aura:build": "turbo build --filter=@drgd/aura build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "test": "echo \"No tests specified\" && exit 0",

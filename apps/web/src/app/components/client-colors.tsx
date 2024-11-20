@@ -1,6 +1,6 @@
 "use client";
 
-import { extractAura } from "@drg/aura/client";
+import { extractAura } from "@drgd/aura/client";
 
 export default function ClientColors({ imageUrl }: { imageUrl: string }) {
   const { colors, isLoading, error } = extractAura(imageUrl);

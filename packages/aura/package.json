@@ -1,6 +1,6 @@
 {
-  "name": "@drg/aura",
-  "version": "0.0.2",
+  "name": "@drgd/aura",
+  "version": "0.0.1",
   "description": "Extract colors from images in seconds - dead simple.",
   "license": "MIT",
   "type": "module",

@@ -35,7 +35,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@drg/aura':
+      '@drgd/aura':
         specifier: workspace:*
         version: link:../../packages/aura
       next:
