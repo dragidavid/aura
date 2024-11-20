@@ -1,6 +1,7 @@
 {
   "name": "aura",
   "version": "0.0.3",
+  "description": "Extract colors from images in seconds - dead simple.",
   "license": "MIT",
   "type": "module",
   "publishConfig": {
@@ -10,6 +11,14 @@
     "name": "dragidavid",
     "url": "https://x.com/dragidavid"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dragidavid/aura.git",
+    "directory": "packages/aura"
+  },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "aura",
     "color",
