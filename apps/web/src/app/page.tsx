@@ -2,8 +2,8 @@ import Images from "@/app/components/images";
 
 export default function Home() {
   return (
-    <div className="grid place-items-center min-h-screen p-8">
-      <main className="flex items-center">
+    <div className="grid min-h-screen place-items-center p-8">
+      <main className="relative flex items-center">
         <Images />
       </main>
     </div>
