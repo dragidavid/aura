@@ -1,9 +1,9 @@
 import Image from "next/image";
 import { headers } from "next/headers";
-import BackgroundWrapper from "@/app/components/background-wrapper";
-import ImageRefresh from "@/app/components/image-refresh";
-import ClientColors from "@/app/components/client-colors";
-import ServerColors from "@/app/components/server-colors";
+import BackgroundWrapper from "@/components/background-wrapper";
+import ImageRefresh from "@/components/image-refresh";
+import ClientColors from "@/components/client-colors";
+import ServerColors from "@/components/server-colors";
 
 export default async function Images() {
   const headersList = await headers();

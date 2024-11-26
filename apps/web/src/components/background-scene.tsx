@@ -3,7 +3,7 @@
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame, extend } from "@react-three/fiber";
 import { useSpring, animated } from "@react-spring/three";
-import { MathUtils, Mesh, DirectionalLight, AmbientLight } from "three";
+import { MathUtils, Mesh, AmbientLight } from "three";
 import {
   Icosahedron,
   Environment,
@@ -14,12 +14,11 @@ import {
   Float,
   Lightformer,
 } from "@react-three/drei";
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { useAtomValue } from "jotai";
-import { colorsAtom } from "../atoms/colors";
+import { colorsAtom } from "@/atoms/colors";
 
 // Extend Three.js elements
-extend({ DirectionalLight, AmbientLight });
+extend({ AmbientLight });
 
 interface BlobProps {
   colorIndex: number;
@@ -40,9 +39,8 @@ const Blob = ({
 }: BlobProps) => {
   const mesh = useRef<Mesh>(null);
   const colors = useAtomValue(colorsAtom);
-  const currentColor = colors[Math.floor(colorIndex / 2)]?.hex || "#ffffff";
+  const currentColor = colors[Math.floor(colorIndex / 2)]?.hex || "#fff";
 
-  // Performance optimized spring configuration
   const { color } = useSpring({
     color: currentColor,
     config: {
@@ -52,13 +50,11 @@ const Blob = ({
     },
   });
 
-  // Optimized frame updates using delta time
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!mesh.current) return;
 
     const time = state.clock.getElapsedTime();
 
-    // Use delta time for smoother animations
     const x = initialPosition[0] + Math.sin(time * speed + uniqueOffset) * 0.6;
     const y =
       initialPosition[1] + Math.cos(time * (speed * 0.8) + uniqueOffset) * 0.5;
@@ -72,23 +68,17 @@ const Blob = ({
 
   return (
     <Float
-      speed={1} // Animation speed
-      rotationIntensity={0.2} // XYZ rotation intensity
-      floatIntensity={0.4} // Up/down float intensity
-      floatingRange={[-0.2, 0.2]} // Range of y-axis values the object will float within
+      speed={1}
+      rotationIntensity={0.2}
+      floatIntensity={0.4}
+      floatingRange={[-0.2, 0.2]}
     >
       <animated.mesh ref={mesh} scale={scale} position={initialPosition}>
         <Icosahedron args={[1, 20]}>
-          <animated.meshPhysicalMaterial
+          <animated.meshStandardMaterial
             color={color}
-            roughness={1}
-            // metalness={0.1}
-            // transmission={0.9}
-            // thickness={1}
-            envMapIntensity={0.8 * intensity}
-            // clearcoat={0.8}
-            // clearcoatRoughness={0.2}
-            opacity={1}
+            roughness={0.78}
+            metalness={0.22}
           />
         </Icosahedron>
       </animated.mesh>
@@ -106,7 +96,7 @@ const Scene = () => {
       .fill(null)
       .map((_, index) => ({
         speed: MathUtils.randFloat(0.15, 0.25),
-        scale: MathUtils.randFloat(0.8, 1),
+        scale: MathUtils.randFloat(0.5, 0.9),
         initialPosition: [
           MathUtils.randFloat(-0.8, 0.8),
           MathUtils.randFloat(-0.6, 0.6),
@@ -133,61 +123,51 @@ const Scene = () => {
 
 export default function BackgroundScene() {
   return (
-    <div className="fixed inset-0 -z-10">
-      <Canvas
-        flat
-        shadows
-        gl={{
-          antialias: false,
-        }}
-        dpr={[1, 1.5]}
-        camera={{ position: [0, 0, 30], fov: 17.5, near: 10, far: 40 }}
-      >
-        <AdaptiveDpr pixelated />
-        <AdaptiveEvents />
-        <Scene />
+    <Canvas
+      flat
+      shadows
+      gl={{
+        antialias: false,
+      }}
+      dpr={[1, 1.5]}
+      camera={{ position: [0, 0, 30], fov: 17.5, near: 10, far: 40 }}
+    >
+      <AdaptiveDpr pixelated />
+      <AdaptiveEvents />
+      <Scene />
 
-        <Environment resolution={256}>
-          <group rotation={[-Math.PI / 3, 0, 1]}>
-            <Lightformer
-              form="circle"
-              intensity={100}
-              rotation-x={Math.PI / 2}
-              position={[0, 5, -9]}
-              scale={2}
-            />
-            <Lightformer
-              form="circle"
-              intensity={2}
-              rotation-y={Math.PI / 2}
-              position={[-5, 1, -1]}
-              scale={2}
-            />
-            <Lightformer
-              form="circle"
-              intensity={2}
-              rotation-y={Math.PI / 2}
-              position={[-5, -1, -1]}
-              scale={2}
-            />
-            <Lightformer
-              form="circle"
-              intensity={2}
-              rotation-y={-Math.PI / 2}
-              position={[10, 1, 0]}
-              scale={8}
-            />
-            <Lightformer
-              form="ring"
-              color="#fff"
-              intensity={80}
-              onUpdate={(self) => self.lookAt(0, 0, 0)}
-              position={[10, 10, 0]}
-              scale={10}
-            />
-          </group>
-        </Environment>
-      </Canvas>
-    </div>
+      <Environment resolution={256}>
+        <group rotation={[-Math.PI / 3, 0, 1]}>
+          <Lightformer
+            form="circle"
+            intensity={100}
+            rotation-x={Math.PI / 2}
+            position={[0, 5, -9]}
+            scale={2}
+          />
+          <Lightformer
+            form="circle"
+            intensity={2}
+            rotation-y={Math.PI / 2}
+            position={[-5, 1, -1]}
+            scale={2}
+          />
+          <Lightformer
+            form="circle"
+            intensity={2}
+            rotation-y={-Math.PI / 2}
+            position={[10, 1, 0]}
+            scale={8}
+          />
+          <Lightformer
+            form="ring"
+            color="#fff"
+            intensity={80}
+            position={[10, 10, 0]}
+            scale={10}
+          />
+        </group>
+      </Environment>
+    </Canvas>
   );
 }
