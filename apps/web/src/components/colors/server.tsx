@@ -1,6 +1,6 @@
 import { extractAura } from "@drgd/aura/server";
 
-export default async function ServerColors({ imageUrl }: { imageUrl: string }) {
+export default async function Server({ imageUrl }: { imageUrl: string }) {
   const colors = await extractAura(imageUrl);
 
   return (
