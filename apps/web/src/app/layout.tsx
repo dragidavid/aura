@@ -1,6 +1,8 @@
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 
+import { Providers } from "@/components/providers";
+
 import { cn } from "@/lib/cn";
 
 import type { Metadata } from "next";
@@ -22,7 +24,9 @@ export default function RootLayout({
       lang="en"
       className={cn(GeistSans.variable, GeistMono.variable, "antialiased")}
     >
-      <body className={cn("bg-black text-white")}>{children}</body>
+      <body className={cn("bg-black text-white")}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
