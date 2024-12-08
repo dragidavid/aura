@@ -1,19 +1,15 @@
 import Image from "next/image";
-import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 import { cn } from "@/lib/cn";
 
-export async function Images() {
-  const headersList = await headers();
-  const timestamp = headersList.get("x-timestamp") || Date.now();
+import { ExtractedColors } from "@/components/extracted-colors";
 
-  const imageId = Math.floor(Math.random() * 1000);
-  const imageUrl = `https://picsum.photos/seed/${imageId}/840/840?t=${timestamp}`;
-
-  console.log(imageUrl);
-
+export function Images({ imageUrl }: { imageUrl: string }) {
   return (
     <div className={cn("relative size-full")}>
+      <ExtractedColors imageUrl={imageUrl} />
+
       <Image
         src={imageUrl}
         alt="Random image from Picsum"
@@ -21,7 +17,25 @@ export async function Images() {
         sizes="840px"
         className="object-cover"
         priority
+        loading="eager"
       />
+
+      <form>
+        <button
+          formAction={async () => {
+            "use server";
+            revalidatePath("/");
+          }}
+          className={cn(
+            "absolute top-full flex h-16 w-full items-center justify-center text-sm uppercase",
+            "border-y border-dashed border-fuchsia-200/20 bg-black",
+            "transition-colors duration-100",
+            "hover:bg-white hover:text-black",
+          )}
+        >
+          get new image
+        </button>
+      </form>
     </div>
   );
 }

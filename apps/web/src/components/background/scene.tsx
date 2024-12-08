@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useCallback } from "react";
 import { Canvas, useFrame, extend } from "@react-three/fiber";
 import { useSpring, animated } from "@react-spring/three";
 import { MathUtils, Mesh, AmbientLight } from "three";
@@ -8,17 +8,13 @@ import {
   Icosahedron,
   Environment,
   Preload,
-  BakeShadows,
-  AdaptiveDpr,
-  AdaptiveEvents,
   Float,
   Lightformer,
-  MeshTransmissionMaterial,
 } from "@react-three/drei";
 import { useAtomValue } from "jotai";
+
 import { colorsAtom } from "@/atoms/colors";
 
-// Extend Three.js elements
 extend({ AmbientLight });
 
 const Blob = ({
@@ -41,26 +37,34 @@ const Blob = ({
   const { color } = useSpring({
     color: currentColor,
     config: {
-      mass: 2,
-      tension: 120,
-      friction: 14,
+      mass: 1.5,
+      tension: 180,
+      friction: 12,
     },
   });
 
+  const animate = useCallback(
+    (time: number) => {
+      if (!mesh.current) return;
+
+      const x =
+        initialPosition[0] + Math.sin(time * speed + uniqueOffset) * 0.6;
+      const y =
+        initialPosition[1] +
+        Math.cos(time * (speed * 0.8) + uniqueOffset) * 0.5;
+      const z =
+        initialPosition[2] +
+        Math.sin(time * (speed * 0.5) + uniqueOffset) * 0.2;
+
+      mesh.current.position.set(x, y, z);
+      mesh.current.rotation.x = Math.sin(time * 0.15 + uniqueOffset) * 0.1;
+      mesh.current.rotation.y = Math.cos(time * 0.15 + uniqueOffset) * 0.1;
+    },
+    [speed, initialPosition, uniqueOffset],
+  );
+
   useFrame((state) => {
-    if (!mesh.current) return;
-
-    const time = state.clock.getElapsedTime();
-
-    const x = initialPosition[0] + Math.sin(time * speed + uniqueOffset) * 0.6;
-    const y =
-      initialPosition[1] + Math.cos(time * (speed * 0.8) + uniqueOffset) * 0.5;
-    const z =
-      initialPosition[2] + Math.sin(time * (speed * 0.5) + uniqueOffset) * 0.2;
-
-    mesh.current.position.set(x, y, z);
-    mesh.current.rotation.x = Math.sin(time * 0.15 + uniqueOffset) * 0.1;
-    mesh.current.rotation.y = Math.cos(time * 0.15 + uniqueOffset) * 0.1;
+    animate(state.clock.getElapsedTime());
   });
 
   return (
@@ -70,14 +74,17 @@ const Blob = ({
       floatIntensity={0.4}
       floatingRange={[-0.2, 0.2]}
     >
+      {/* @ts-expect-error - types are not fully compatible */}
       <animated.mesh ref={mesh} scale={scale} position={initialPosition}>
         <Icosahedron args={[1, 20]}>
+          {/* @ts-expect-error - types are not fully compatible */}
           <animated.meshStandardMaterial
             color={color}
             roughness={0.8}
             metalness={0.2}
           />
         </Icosahedron>
+        {/* @ts-expect-error - types are not fully compatible */}
       </animated.mesh>
     </Float>
   );
@@ -106,12 +113,14 @@ export function Scene() {
   return (
     <Canvas
       flat
-      shadows
       gl={{
         antialias: false,
+        powerPreference: "high-performance",
+        alpha: false,
       }}
       dpr={[1, 1.5]}
       camera={{ position: [0, 0, 30], fov: 17.5, near: 10, far: 40 }}
+      performance={{ min: 0.5 }}
     >
       <ambientLight intensity={1} />
 
@@ -119,11 +128,7 @@ export function Scene() {
         <Blob key={`blob-${index}`} colorIndex={index} {...config} />
       ))}
 
-      <BakeShadows />
       <Preload all />
-
-      <AdaptiveDpr pixelated />
-      <AdaptiveEvents />
 
       <Environment resolution={256}>
         <group rotation={[-Math.PI / 3, 0, 1]}>
