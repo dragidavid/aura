@@ -1,3 +1,5 @@
+import { Analytics } from "@vercel/analytics/react";
+
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 
@@ -24,8 +26,9 @@ export default function RootLayout({
       lang="en"
       className={cn(GeistSans.variable, GeistMono.variable, "antialiased")}
     >
-      <body className={cn("bg-black text-white")}>
+      <body className={cn("font-mono", "bg-black text-white")}>
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
