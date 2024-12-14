@@ -1,30 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useCallback } from "react";
-import { useSetAtom } from "jotai";
-import { extractAura } from "@drgd/aura/client";
+import { useMemo } from "react";
 import { useTransition, animated } from "@react-spring/web";
-
-import { colorsAtom } from "@/atoms/colors";
 
 import { cn } from "@/lib/cn";
 
-export function Client({ imageUrl }: { imageUrl: string }) {
-  const { colors, isLoading, error } = extractAura(imageUrl);
+// TODO: change this once the export is fixed in the package
+import type { AuraColor } from "@drgd/aura/client";
 
-  const setColors = useSetAtom(colorsAtom);
-
-  const updateColors = useCallback(() => {
-    if (colors && !isLoading && !error) {
-      setColors(colors);
-    }
-  }, [colors, isLoading, error, setColors]);
-
-  useEffect(() => {
-    const timeoutId = setTimeout(updateColors, 0);
-    return () => clearTimeout(timeoutId);
-  }, [updateColors]);
-
+export function Colors({ colors }: { colors: AuraColor[] }) {
   const items = useMemo(
     () =>
       colors.map((color, index) => ({
@@ -50,13 +34,16 @@ export function Client({ imageUrl }: { imageUrl: string }) {
   });
 
   return (
-    <div className={cn("relative flex w-full flex-col justify-around")}>
-      <span className="py-2">client</span>
-
-      <div className={cn("relative flex h-8 gap-px")}>
+    <div
+      className={cn(
+        "absolute bottom-[calc(100%+1px)] flex w-full flex-col text-xs uppercase",
+        "border-t border-dashed border-fuchsia-200/20",
+      )}
+    >
+      <div className={cn("relative flex h-8", "bg-black")}>
         {Array.from({ length: 6 }).map((_, index) => (
           <div
-            key={`client-color-${index}`}
+            key={`color-${index}`}
             className={cn("relative w-full")}
             style={{
               position: "relative",
