@@ -164,7 +164,7 @@ export function Images({
           onClick={() => handleImageChange("previous")}
           className={cn(
             "absolute left-4 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-2xl",
-            "bg-black shadow-lg",
+            "border border-fuchsia-200/20 bg-black shadow-lg",
             "transition-transform",
             "hover:scale-110",
           )}
@@ -179,7 +179,7 @@ export function Images({
           onClick={() => handleImageChange("next")}
           className={cn(
             "absolute right-4 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-2xl",
-            "bg-black shadow-lg",
+            "border border-fuchsia-200/20 bg-black shadow-lg",
             "transition-transform",
             "hover:scale-110",
           )}

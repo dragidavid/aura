@@ -5,9 +5,10 @@ export function Frame({ children }: { children: React.ReactNode }) {
     <div
       className={cn(
         "grid min-h-dvh w-screen overflow-hidden",
-        "grid-cols-[minmax(48px,1fr)_minmax(0,384px)_minmax(48px,1fr)]",
-        "grid-rows-[minmax(48px,1fr)_minmax(0,384px)_48px]",
-        "sm:grid-rows-[minmax(48px,1fr)_minmax(0,384px)_minmax(48px,1fr)]",
+        "grid-cols-[minmax(48px,1fr)_minmax(0,320px)_minmax(48px,1fr)]",
+        "grid-rows-[minmax(48px,1fr)_minmax(0,320px)_48px]",
+        "sm:grid-cols-[minmax(48px,1fr)_minmax(0,420px)_minmax(48px,1fr)]",
+        "sm:grid-rows-[minmax(48px,1fr)_minmax(0,420px)_minmax(48px,1fr)]",
       )}
     >
       <div

@@ -53,10 +53,10 @@ const Blob = ({
 
       const x =
         initialPosition[0] +
-        Math.sin(time * speed + uniqueOffset) * (isMobile ? 0.4 : 0.6);
+        Math.sin(time * speed + uniqueOffset) * (isMobile ? 0.5 : 0.6);
       const y =
         initialPosition[1] +
-        Math.cos(time * (speed * 0.8) + uniqueOffset) * (isMobile ? 0.3 : 0.5);
+        Math.cos(time * (speed * 0.8) + uniqueOffset) * (isMobile ? 0.4 : 0.5);
       const z =
         initialPosition[2] +
         Math.sin(time * (speed * 0.5) + uniqueOffset) * 0.2;
@@ -102,10 +102,10 @@ export function Background({ colors }: { colors: AuraColor[] }) {
       .fill(null)
       .map((_, index) => ({
         speed: MathUtils.randFloat(0.15, 0.25),
-        scale: MathUtils.randFloat(isMobile ? 1.2 : 0.8, isMobile ? 1.8 : 1),
+        scale: MathUtils.randFloat(isMobile ? 2 : 0.8, isMobile ? 1.8 : 1),
         initialPosition: [
           MathUtils.randFloat(-0.8, 0.8),
-          MathUtils.randFloat(isMobile ? -1.8 : -0.6, isMobile ? -0.5 : 0.6),
+          MathUtils.randFloat(isMobile ? -1.8 : -0.6, isMobile ? -0.6 : 0.6),
           MathUtils.randFloat(-0.3, 0.3),
         ] as [number, number, number],
         uniqueOffset: Math.random() * Math.PI * 2,
