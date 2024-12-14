@@ -37,7 +37,7 @@ export function Colors({ colors }: { colors: AuraColor[] }) {
     <div
       className={cn(
         "absolute bottom-[calc(100%+1px)] flex w-full flex-col text-xs uppercase",
-        "border-t border-dashed border-fuchsia-200/20",
+        "border-t border-dashed border-fuchsia-200/20 saturate-150",
       )}
     >
       <div className={cn("relative flex h-8", "bg-black")}>

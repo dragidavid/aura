@@ -4,7 +4,7 @@ export function Frame({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "grid min-h-dvh w-screen grid-cols-[minmax(24px,1fr)_minmax(0,420px)_minmax(24px,1fr)] grid-rows-[minmax(24px,1fr)_minmax(0,420px)_minmax(24px,1fr)] overflow-hidden",
+        "grid min-h-dvh w-screen grid-cols-[minmax(32px,1fr)_minmax(0,384px)_minmax(32px,1fr)] grid-rows-[minmax(32px,1fr)_minmax(0,384px)_minmax(32px,1fr)] overflow-hidden",
       )}
     >
       <div

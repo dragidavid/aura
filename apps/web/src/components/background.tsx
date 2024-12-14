@@ -13,6 +13,8 @@ import {
   Lightformer,
 } from "@react-three/drei";
 
+import { useIsMobile } from "@/hooks/use-is-mobile";
+
 import { cn } from "@/lib/cn";
 
 // TODO: change this once the export is fixed in the package
@@ -27,6 +29,7 @@ const Blob = ({
   initialPosition,
   uniqueOffset,
   colors,
+  isMobile,
 }: {
   colorIndex: number;
   speed: number;
@@ -34,6 +37,7 @@ const Blob = ({
   initialPosition: [number, number, number];
   uniqueOffset: number;
   colors: AuraColor[];
+  isMobile: boolean;
 }) => {
   const mesh = useRef<Mesh>(null);
   const currentColor = colors[Math.floor(colorIndex / 2)]?.hex || "#fff";
@@ -48,10 +52,11 @@ const Blob = ({
       if (!mesh.current) return;
 
       const x =
-        initialPosition[0] + Math.sin(time * speed + uniqueOffset) * 0.6;
+        initialPosition[0] +
+        Math.sin(time * speed + uniqueOffset) * (isMobile ? 0.4 : 0.6);
       const y =
         initialPosition[1] +
-        Math.cos(time * (speed * 0.8) + uniqueOffset) * 0.5;
+        Math.cos(time * (speed * 0.8) + uniqueOffset) * (isMobile ? 0.3 : 0.5);
       const z =
         initialPosition[2] +
         Math.sin(time * (speed * 0.5) + uniqueOffset) * 0.2;
@@ -60,7 +65,7 @@ const Blob = ({
       mesh.current.rotation.x = Math.sin(time * 0.15 + uniqueOffset) * 0.1;
       mesh.current.rotation.y = Math.cos(time * 0.15 + uniqueOffset) * 0.1;
     },
-    [speed, initialPosition, uniqueOffset],
+    [speed, initialPosition, uniqueOffset, isMobile],
   );
 
   useFrame((state) => animate(state.clock.getElapsedTime()));
@@ -89,22 +94,24 @@ const Blob = ({
 };
 
 export function Background({ colors }: { colors: AuraColor[] }) {
+  const { isMobile } = useIsMobile();
+
   const blobConfigs = useMemo(() => {
     const totalBlobs = colors.length * 2;
     return Array(totalBlobs)
       .fill(null)
       .map((_, index) => ({
         speed: MathUtils.randFloat(0.15, 0.25),
-        scale: MathUtils.randFloat(0.5, 0.9),
+        scale: MathUtils.randFloat(isMobile ? 1.2 : 0.5, isMobile ? 1.8 : 0.9),
         initialPosition: [
           MathUtils.randFloat(-0.8, 0.8),
-          MathUtils.randFloat(-0.6, 0.6),
+          MathUtils.randFloat(isMobile ? -1.5 : -0.6, isMobile ? -0.5 : 0.6),
           MathUtils.randFloat(-0.3, 0.3),
         ] as [number, number, number],
         uniqueOffset: Math.random() * Math.PI * 2,
         intensity: index % 2 === 0 ? 1 : 0.7,
       }));
-  }, [colors.length]);
+  }, [colors.length, isMobile]);
 
   const fadeIn = useWebSpring({
     from: { opacity: 0 },
@@ -126,7 +133,12 @@ export function Background({ colors }: { colors: AuraColor[] }) {
             alpha: false,
           }}
           dpr={[1, 1.5]}
-          camera={{ position: [0, 0, 30], fov: 17.5, near: 10, far: 40 }}
+          camera={{
+            position: [0, 0, isMobile ? 25 : 30],
+            fov: isMobile ? 20 : 17.5,
+            near: 10,
+            far: 40,
+          }}
           performance={{ min: 0.5 }}
         >
           <ambientLight intensity={1} />
@@ -135,6 +147,7 @@ export function Background({ colors }: { colors: AuraColor[] }) {
               key={`blob-${index}`}
               colors={colors}
               colorIndex={index}
+              isMobile={isMobile}
               {...config}
             />
           ))}
@@ -173,6 +186,14 @@ export function Background({ colors }: { colors: AuraColor[] }) {
           </Environment>
         </Canvas>
       </animated.div>
+
+      <div
+        className={cn(
+          "fixed inset-0 -z-10",
+          "pointer-events-none",
+          "backdrop-blur-3xl backdrop-brightness-150 backdrop-saturate-150",
+        )}
+      />
     </Suspense>
   );
 }

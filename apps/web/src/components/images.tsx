@@ -159,20 +159,6 @@ export function Images({
         ))}
       </animated.div>
 
-      <div
-        className={cn(
-          "absolute inset-y-0 right-3/4 w-[50vw]",
-          "bg-gradient-to-l from-transparent to-black",
-        )}
-      />
-
-      <div
-        className={cn(
-          "absolute inset-y-0 left-3/4 w-[50vw]",
-          "bg-gradient-to-r from-transparent to-black",
-        )}
-      />
-
       {currentIndex > 0 && (
         <button
           onClick={() => handleImageChange("previous")}
