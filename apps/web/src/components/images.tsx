@@ -91,10 +91,12 @@ export function Images({
     {
       from: () => [props.x.get(), 0],
       filterTaps: true,
-      bounds: {
-        left: -containerRef.current?.offsetWidth! * (images.length - 1),
-        right: 0,
-      },
+      bounds: containerRef.current
+        ? {
+            left: -containerRef.current.offsetWidth * (images.length - 1),
+            right: 0,
+          }
+        : undefined,
       rubberband: true,
       enabled: isMobile,
       axis: "x",
@@ -157,18 +159,32 @@ export function Images({
         ))}
       </animated.div>
 
+      <div
+        className={cn(
+          "absolute inset-y-0 right-3/4 w-[50vw]",
+          "bg-gradient-to-l from-transparent to-black",
+        )}
+      />
+
+      <div
+        className={cn(
+          "absolute inset-y-0 left-3/4 w-[50vw]",
+          "bg-gradient-to-r from-transparent to-black",
+        )}
+      />
+
       {currentIndex > 0 && (
         <button
           onClick={() => handleImageChange("previous")}
           className={cn(
-            "absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full",
-            "bg-white/80 p-2 shadow-lg backdrop-blur-sm",
-            "transition-colors",
-            "hover:bg-white/90",
+            "absolute left-4 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-2xl",
+            "bg-black shadow-lg",
+            "transition-transform",
+            "hover:scale-110",
           )}
           aria-label="Previous image"
         >
-          left
+          ←
         </button>
       )}
 
@@ -176,13 +192,14 @@ export function Images({
         <button
           onClick={() => handleImageChange("next")}
           className={cn(
-            "absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full",
-            "bg-white/80 p-2 shadow-lg backdrop-blur-sm",
-            "transition-colors hover:bg-white/90",
+            "absolute right-4 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-2xl",
+            "bg-black shadow-lg",
+            "transition-transform",
+            "hover:scale-110",
           )}
           aria-label="Next image"
         >
-          right
+          →
         </button>
       )}
     </div>
