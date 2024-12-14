@@ -1,41 +1,190 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { revalidatePath } from "next/cache";
+import { animated, useSpring } from "@react-spring/web";
+import { useDrag } from "@use-gesture/react";
+
+import { Colors } from "@/components/colors";
+import { Background } from "@/components/background";
+
+import { useIsMobile } from "@/hooks/use-is-mobile";
 
 import { cn } from "@/lib/cn";
 
-import { ExtractedColors } from "@/components/extracted-colors";
+// TODO: change this once the export is fixed in the package
+import type { AuraColor } from "@drgd/aura/client";
 
-export function Images({ imageUrl }: { imageUrl: string }) {
+export function Images({
+  images,
+  preloadedColors,
+}: {
+  images: string[];
+  preloadedColors: Record<number, AuraColor[]>;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const { isMobile } = useIsMobile();
+
+  const imageWidth = 100;
+  const totalWidth = imageWidth * images.length;
+
+  const [props, api] = useSpring(() => ({
+    x: 0,
+    config: { tension: 280, friction: 60 },
+  }));
+
+  const updatePosition = (index: number) => {
+    if (!containerRef.current) return;
+
+    const containerWidth = containerRef.current.offsetWidth;
+
+    api.start({
+      x: -index * containerWidth,
+    });
+  };
+
+  const handleImageChange = (direction: "next" | "previous") => {
+    if (direction === "next") {
+      if (currentIndex < images.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+      }
+    } else {
+      if (currentIndex > 0) {
+        setCurrentIndex(currentIndex - 1);
+      }
+    }
+  };
+
+  const bind = useDrag(
+    ({ active, movement: [mx], velocity: [vx] }) => {
+      if (!containerRef.current || !isMobile) return;
+
+      const containerWidth = containerRef.current.offsetWidth;
+      const currentOffset = -currentIndex * containerWidth;
+      const proposedPosition = currentOffset + mx;
+
+      if (active) {
+        api.start({ x: proposedPosition, immediate: true });
+      } else {
+        const moveThreshold = containerWidth * 0.2;
+        const velocityThreshold = 0.5;
+
+        const shouldMoveNext =
+          (-mx > moveThreshold || vx < -velocityThreshold) &&
+          currentIndex < images.length - 1;
+
+        const shouldMovePrevious =
+          (mx > moveThreshold || vx > velocityThreshold) && currentIndex > 0;
+
+        if (shouldMoveNext) {
+          setCurrentIndex(currentIndex + 1);
+        } else if (shouldMovePrevious) {
+          setCurrentIndex(currentIndex - 1);
+        } else {
+          updatePosition(currentIndex);
+        }
+      }
+    },
+    {
+      from: () => [props.x.get(), 0],
+      filterTaps: true,
+      bounds: {
+        left: -containerRef.current?.offsetWidth! * (images.length - 1),
+        right: 0,
+      },
+      rubberband: true,
+      enabled: isMobile,
+      axis: "x",
+    },
+  );
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      updatePosition(currentIndex);
+    });
+
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [images]);
+
+  useEffect(() => {
+    updatePosition(currentIndex);
+  }, [currentIndex]);
+
+  if (images.length === 0) return null;
+
   return (
-    <div className={cn("relative size-full")}>
-      <ExtractedColors imageUrl={imageUrl} />
+    <div ref={containerRef} className={cn("relative size-full")}>
+      <Background colors={preloadedColors[currentIndex]} />
 
-      <Image
-        src={imageUrl}
-        alt="Random image from Picsum"
-        fill
-        sizes="840px"
-        className="object-cover"
-        priority
-        loading="eager"
-      />
+      <Colors colors={preloadedColors[currentIndex]} />
 
-      <form>
+      <animated.div
+        {...(isMobile ? bind() : {})}
+        className={cn(
+          "absolute flex h-full",
+          isMobile ? "touch-pan-x" : "touch-none",
+        )}
+        style={{
+          width: `${totalWidth}%`,
+          x: props.x,
+        }}
+      >
+        {images.map((image, i) => (
+          <div
+            key={image}
+            className={cn("relative h-full select-none")}
+            style={{ width: `${imageWidth}%` }}
+          >
+            <Image
+              src={image}
+              alt={`Carousel image ${i + 1}`}
+              fill
+              sizes="840px"
+              className={cn("pointer-events-none object-cover")}
+              priority
+              loading="eager"
+            />
+          </div>
+        ))}
+      </animated.div>
+
+      {currentIndex > 0 && (
         <button
-          formAction={async () => {
-            "use server";
-            revalidatePath("/");
-          }}
+          onClick={() => handleImageChange("previous")}
           className={cn(
-            "absolute top-full flex h-16 w-full items-center justify-center text-sm uppercase",
-            "border-y border-dashed border-fuchsia-200/20 bg-black",
-            "transition-colors duration-100",
-            "hover:bg-white hover:text-black",
+            "absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full",
+            "bg-white/80 p-2 shadow-lg backdrop-blur-sm",
+            "transition-colors",
+            "hover:bg-white/90",
           )}
+          aria-label="Previous image"
         >
-          get new image
+          left
         </button>
-      </form>
+      )}
+
+      {currentIndex < images.length - 1 && (
+        <button
+          onClick={() => handleImageChange("next")}
+          className={cn(
+            "absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full",
+            "bg-white/80 p-2 shadow-lg backdrop-blur-sm",
+            "transition-colors hover:bg-white/90",
+          )}
+          aria-label="Next image"
+        >
+          right
+        </button>
+      )}
     </div>
   );
 }

@@ -1,28 +1,27 @@
-import { Suspense } from "react";
-import { connection } from "next/server";
+import { extractAura } from "@drgd/aura/server";
 
 import { Images } from "@/components/images";
-import { Background } from "@/components/background";
 
 import { Frame } from "@/components/ui/frame";
 
-async function Page() {
-  await connection();
+export default async function Page() {
+  const images = Array.from(
+    { length: 5 },
+    () =>
+      `https://picsum.photos/seed/${Math.floor(Math.random() * 1000)}/800/600`,
+  );
 
-  const imageId = Math.floor(Math.random() * 1000);
-  const imageUrl = `https://picsum.photos/seed/${imageId}/840/840`;
+  const colorsArray = await Promise.all(
+    images.map((imageUrl) => extractAura(imageUrl)),
+  );
 
-  return <Images imageUrl={imageUrl} />;
-}
+  const colorsByImage = Object.fromEntries(
+    colorsArray.map((colors, index) => [index, colors]),
+  );
 
-export default function Home() {
   return (
     <Frame>
-      <Background />
-
-      <Suspense fallback={<span>×</span>}>
-        <Page />
-      </Suspense>
+      <Images images={images} preloadedColors={colorsByImage} />
     </Frame>
   );
 }
