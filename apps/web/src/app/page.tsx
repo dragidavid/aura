@@ -4,6 +4,8 @@ import { Images } from "@/components/images";
 
 import { Frame } from "@/components/ui/frame";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const images = Array.from(
     { length: 5 },
