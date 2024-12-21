@@ -1,3 +1,5 @@
+import { Logo } from "@/components/ui/logo";
+
 import { cn } from "@/lib/cn";
 
 export function Frame({ children }: { children: React.ReactNode }) {
@@ -25,6 +27,10 @@ export function Frame({ children }: { children: React.ReactNode }) {
           "border-r border-dashed border-fuchsia-200/20",
         )}
       />
+
+      <section className={cn("relative col-start-2 row-start-1 p-3")}>
+        <Logo />
+      </section>
 
       <main
         className={cn(
