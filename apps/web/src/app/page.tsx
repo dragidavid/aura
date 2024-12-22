@@ -1,11 +1,29 @@
-import Images from "@/app/components/images";
+import { extractAura } from "@drgd/aura/server";
 
-export default function Home() {
+import { Images } from "@/components/images";
+
+import { Frame } from "@/components/ui/frame";
+
+export const dynamic = "force-dynamic";
+
+export default async function Page() {
+  const images = Array.from(
+    { length: 5 },
+    () =>
+      `https://picsum.photos/seed/${Math.floor(Math.random() * 1000)}/800/600`,
+  );
+
+  const colorsArray = await Promise.all(
+    images.map((imageUrl) => extractAura(imageUrl)),
+  );
+
+  const colorsByImage = Object.fromEntries(
+    colorsArray.map((colors, index) => [index, colors]),
+  );
+
   return (
-    <div className="grid place-items-center min-h-screen p-8">
-      <main className="flex items-center">
-        <Images />
-      </main>
-    </div>
+    <Frame>
+      <Images images={images} preloadedColors={colorsByImage} />
+    </Frame>
   );
 }
