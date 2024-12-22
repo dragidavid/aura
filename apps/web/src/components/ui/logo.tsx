@@ -28,7 +28,7 @@ export function Logo({ size = 32 }: Props) {
       <div
         className={cn(
           "absolute rounded-full",
-          "border border-dashed border-white/40 bg-black/20 shadow-lg shadow-black backdrop-blur-sm",
+          "border border-dashed border-white/60 bg-black/20 shadow-lg shadow-black backdrop-blur-sm",
         )}
         style={{
           width: size,

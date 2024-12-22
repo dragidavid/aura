@@ -105,7 +105,7 @@ export function Background({ colors }: { colors: AuraColor[] }) {
         scale: MathUtils.randFloat(isMobile ? 1.4 : 0.6, isMobile ? 1.8 : 0.8),
         initialPosition: [
           MathUtils.randFloat(-0.8, 0.8),
-          MathUtils.randFloat(isMobile ? -2 : -0.6, isMobile ? -1.8 : 0.6),
+          MathUtils.randFloat(isMobile ? -2 : -0.6, isMobile ? -1.7 : 0.6),
           MathUtils.randFloat(-0.3, 0.3),
         ] as [number, number, number],
         uniqueOffset: Math.random() * Math.PI * 2,

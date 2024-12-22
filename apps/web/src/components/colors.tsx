@@ -34,34 +34,23 @@ export function Colors({ colors }: { colors: AuraColor[] }) {
   });
 
   return (
-    <div
-      className={cn(
-        "absolute bottom-[calc(100%+1px)] flex w-full flex-col text-xs uppercase",
-        "border-t border-dashed border-fuchsia-200/20 saturate-150",
-      )}
-    >
-      <div className={cn("relative flex h-8", "bg-black")}>
+    <div className={cn("absolute bottom-full w-full p-3", "saturate-150")}>
+      <div className={cn("relative flex h-8 justify-between", "sm:h-10")}>
         {Array.from({ length: 6 }).map((_, index) => (
-          <div
-            key={`color-${index}`}
-            className={cn("relative w-full")}
-            style={{
-              position: "relative",
-              zIndex: 1,
-            }}
-          >
+          <div key={`color-${index}`} className={cn("relative w-8", "sm:w-10")}>
             {transitions((style, item) => {
               if (item.position !== index) return null;
+
               return (
                 <animated.div
                   key={item.hex}
+                  className={cn(
+                    "absolute inset-0 rounded-full",
+                    "border border-dashed border-white/60 shadow-xl shadow-black/60 backdrop-blur-sm",
+                  )}
                   style={{
                     ...style,
                     backgroundColor: item.hex,
-                    position: "absolute",
-                    inset: 0,
-                    zIndex: 2,
-                    willChange: "opacity",
                   }}
                 />
               );
