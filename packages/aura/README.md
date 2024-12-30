@@ -1,4 +1,8 @@
 <div align="center">
+  <picture>
+    <img alt="Aura logo" src="https://github.com/user-attachments/assets/4ffe1daa-77dd-4e78-8109-f79f90688b7f">
+  </picture>
+  
   <h1><b>Aura</b></h1>
   <p>Extract beautiful color palettes from any image. Zero config, works everywhere.</p>
 </div>
