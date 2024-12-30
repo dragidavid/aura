@@ -1,3 +1,11 @@
+/**
+ * Represents a color with RGB values and a count of pixels.
+ *
+ * @param r - The red component of the color (0-255)
+ * @param g - The green component of the color (0-255)
+ * @param b - The blue component of the color (0-255)
+ * @param count - The number of pixels that have this color (default is 1)
+ */
 export class Color {
   constructor(
     public r: number,
@@ -31,6 +39,14 @@ export class Color {
   }
 }
 
+/**
+ * Converts an RGB color to a hexadecimal string.
+ *
+ * @param r - The red component of the color (0-255)
+ * @param g - The green component of the color (0-255)
+ * @param b - The blue component of the color (0-255)
+ * @returns The hexadecimal representation of the color
+ */
 export function rgbToHex(r: number, g: number, b: number): string {
   return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
 }

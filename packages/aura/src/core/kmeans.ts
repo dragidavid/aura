@@ -1,5 +1,14 @@
 import { Color } from "./color";
 
+// Memoized distance calculation to avoid recalculating distances
+const memoizedDistance = (color: Color, centroid: Color): number => {
+  return (
+    Math.pow(color.r - centroid.r, 2) +
+    Math.pow(color.g - centroid.g, 2) +
+    Math.pow(color.b - centroid.b, 2)
+  );
+};
+
 /**
  * Implements k-means clustering algorithm with k-means++ initialization.
  * This algorithm finds k representative colors from the input color set.
@@ -51,29 +60,38 @@ export function kMeansClustering(
 
   let currentCentroids = [...centroids];
 
+  // Cache previous assignments to avoid recalculating distances
+  let previousAssignments = new Map<string, number>();
+
   // Iterate until convergence or max iterations
   for (let iteration = 0; iteration < maxIterations; iteration++) {
     const clusters: Color[][] = Array.from({ length: k }, () => []);
+    const currentAssignments = new Map<string, number>();
 
-    // Assign colors to nearest centroid
+    // Assign colors to nearest centroid with caching
     for (const color of colors) {
-      let minDistance = Infinity;
-      let nearestIndex = 0;
+      const colorKey = `${color.r},${color.g},${color.b}`;
+      let nearestIndex = previousAssignments.get(colorKey);
 
-      currentCentroids.forEach((centroid, i) => {
-        const distance =
-          Math.pow(color.r - centroid.r, 2) +
-          Math.pow(color.g - centroid.g, 2) +
-          Math.pow(color.b - centroid.b, 2);
+      if (nearestIndex === undefined) {
+        let minDistance = Infinity;
+        nearestIndex = 0;
 
-        if (distance < minDistance) {
-          minDistance = distance;
-          nearestIndex = i;
-        }
-      });
+        currentCentroids.forEach((centroid, i) => {
+          const distance = memoizedDistance(color, centroid);
 
+          if (distance < minDistance) {
+            minDistance = distance;
+            nearestIndex = i;
+          }
+        });
+      }
+
+      currentAssignments.set(colorKey, nearestIndex);
       clusters[nearestIndex]?.push(color);
     }
+
+    previousAssignments = currentAssignments;
 
     // Calculate new centroids
     const newCentroids = clusters.map((cluster) => {
@@ -93,10 +111,12 @@ export function kMeansClustering(
       );
     });
 
+    // If centroids have converged, return the new centroids
     if (hasConverged) {
       return newCentroids.filter((centroid) => centroid !== undefined);
     }
 
+    // Otherwise, update centroids for the next iteration
     currentCentroids = newCentroids.filter(
       (centroid) => centroid !== undefined
     );

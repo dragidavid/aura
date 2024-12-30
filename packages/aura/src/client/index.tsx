@@ -10,29 +10,62 @@ type AuraResponse = {
   error: Error | null;
 };
 
-function extractAura(imageUrl: string, numColors: number = 6): AuraResponse {
-  const [colors, setColors] = useState<AuraColor[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+/**
+ * A React hook that extracts dominant colors from an image URL.
+ *
+ * @param imageUrl - The URL of the image to extract colors from. Must be CORS-enabled or from the same origin.
+ * @param numColors - The number of colors to extract from the image. Defaults to 6.
+ * @returns An object containing the extracted colors, a loading state, and an error state.
+ */
+export function useAura(imageUrl: string, numColors: number = 6): AuraResponse {
+  const [state, setState] = useState<AuraResponse>({
+    colors: [],
+    isLoading: true,
+    error: null,
+  });
 
   useEffect(() => {
+    if (!imageUrl) {
+      setState({ colors: [], isLoading: false, error: null });
+
+      return;
+    }
+
+    let abortController = new AbortController();
     let mounted = true;
 
     const getColors = async () => {
       try {
-        setIsLoading(true);
-        setError(null);
+        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+        const timeoutId = setTimeout(() => {
+          if (mounted) {
+            setState((prev) => ({
+              ...prev,
+              error: new Error("Color extraction timed out"),
+              isLoading: false,
+            }));
+          }
+        }, 10000); // 10 second timeout
+
         const result = await extractColors(imageUrl, numColors);
+
+        clearTimeout(timeoutId);
+
         if (mounted) {
-          setColors(result);
+          setState({
+            colors: result,
+            isLoading: false,
+            error: null,
+          });
         }
       } catch (err) {
         if (mounted) {
-          setError(err instanceof Error ? err : new Error(String(err)));
-        }
-      } finally {
-        if (mounted) {
-          setIsLoading(false);
+          setState({
+            colors: [],
+            isLoading: false,
+            error: err instanceof Error ? err : new Error(String(err)),
+          });
         }
       }
     };
@@ -41,11 +74,9 @@ function extractAura(imageUrl: string, numColors: number = 6): AuraResponse {
 
     return () => {
       mounted = false;
+      abortController.abort();
     };
   }, [imageUrl, numColors]);
 
-  return { colors, isLoading, error };
+  return state;
 }
-
-export { extractAura };
-export type { AuraResponse, AuraColor };
