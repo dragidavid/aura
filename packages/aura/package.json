@@ -1,6 +1,6 @@
 {
   "name": "@drgd/aura",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Extract beautiful color palettes from any image. Zero config, works everywhere.",
   "license": "MIT",
   "type": "module",
