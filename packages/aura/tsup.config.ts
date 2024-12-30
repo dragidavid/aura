@@ -4,6 +4,7 @@ export default defineConfig({
   clean: true,
   dts: true,
   entry: {
+    index: "src/index.ts",
     client: "src/client/index.tsx",
     server: "src/server/index.ts",
   },
