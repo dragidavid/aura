@@ -17,8 +17,7 @@ import { useIsMobile } from "@/hooks/use-is-mobile";
 
 import { cn } from "@/lib/cn";
 
-// TODO: change this once the export is fixed in the package
-import type { AuraColor } from "@drgd/aura/client";
+import type { AuraColor } from "@drgd/aura";
 
 extend({ AmbientLight });
 

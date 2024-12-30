@@ -12,8 +12,7 @@ import { useIsMobile } from "@/hooks/use-is-mobile";
 
 import { cn } from "@/lib/cn";
 
-// TODO: change this once the export is fixed in the package
-import type { AuraColor } from "@drgd/aura/client";
+import type { AuraColor } from "@drgd/aura";
 
 export function Images({
   images,
@@ -150,10 +149,12 @@ export function Images({
               src={image}
               alt={`Carousel image ${i + 1}`}
               fill
-              sizes="840px"
+              sizes="420px"
+              priority={i === 0}
+              loading={i === 0 ? "eager" : "lazy"}
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIbGNtcwIQAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LC0vMjQ0ODQ2NDEzOj4+QUE+PzpHR0tLS0Y2RjZLS0tLS0v/2wBDARUXFx4aHjshITs7S0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0v/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAP/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
               className={cn("pointer-events-none object-cover")}
-              priority
-              loading="eager"
             />
           </div>
         ))}
@@ -163,8 +164,8 @@ export function Images({
         <button
           onClick={() => handleImageChange("previous")}
           className={cn(
-            "absolute left-4 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-2xl",
-            "border border-fuchsia-200/20 bg-black shadow-lg",
+            "absolute left-3 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-xl",
+            "border border-white/40 bg-black/70 shadow-xl shadow-black/70 backdrop-blur-sm",
             "transition-transform",
             "hover:scale-110",
           )}
@@ -178,8 +179,8 @@ export function Images({
         <button
           onClick={() => handleImageChange("next")}
           className={cn(
-            "absolute right-4 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-2xl",
-            "border border-fuchsia-200/20 bg-black shadow-lg",
+            "absolute right-3 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-xl",
+            "border border-white/40 bg-black/70 shadow-xl shadow-black/70 backdrop-blur-sm",
             "transition-transform",
             "hover:scale-110",
           )}

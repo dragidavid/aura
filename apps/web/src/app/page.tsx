@@ -1,4 +1,4 @@
-import { extractAura } from "@drgd/aura/server";
+import { getAura } from "@drgd/aura/server";
 
 import { Images } from "@/components/images";
 
@@ -14,7 +14,7 @@ export default async function Page() {
   );
 
   const colorsArray = await Promise.all(
-    images.map((imageUrl) => extractAura(imageUrl)),
+    images.map((imageUrl) => getAura(imageUrl)),
   );
 
   const colorsByImage = Object.fromEntries(

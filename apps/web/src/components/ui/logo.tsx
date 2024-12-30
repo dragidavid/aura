@@ -6,7 +6,7 @@ type Props = {
 
 export function Logo({ size = 32 }: Props) {
   return (
-    <div className={cn("relative")} style={{ width: size * 2, height: size }}>
+    <div className="relative" style={{ width: size * 2, height: size }}>
       <div
         className={cn(
           "absolute left-0 rounded-full",
@@ -28,7 +28,7 @@ export function Logo({ size = 32 }: Props) {
       <div
         className={cn(
           "absolute rounded-full",
-          "border border-dashed border-white/60 bg-black/20 shadow-lg shadow-black backdrop-blur-sm",
+          "border border-dashed border-white/70 bg-black/20 shadow-lg shadow-black backdrop-blur-sm",
         )}
         style={{
           width: size,
