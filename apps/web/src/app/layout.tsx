@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import type { Metadata } from "next";
 
 import "./globals.css";
+import "nextra-theme-docs/style.css";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      dir="ltr"
       className={cn(GeistSans.variable, GeistMono.variable, "antialiased")}
+      suppressHydrationWarning
     >
       <body className={cn("font-mono", "bg-black text-white")}>
         {children}

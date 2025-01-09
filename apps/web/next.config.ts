@@ -1,3 +1,6 @@
+import nextra from "nextra";
+import withPlaiceholder from "@plaiceholder/next";
+
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -6,4 +9,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withNextra = nextra({});
+
+export default withPlaiceholder(withNextra(nextConfig));
