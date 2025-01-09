@@ -18,7 +18,7 @@ export function Images({
   images,
   preloadedColors,
 }: {
-  images: string[];
+  images: { src: string; base64: string }[];
   preloadedColors: Record<number, AuraColor[]>;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,7 +32,7 @@ export function Images({
 
   const [props, api] = useSpring(() => ({
     x: 0,
-    config: { tension: 280, friction: 60 },
+    config: { tension: 320, friction: 32, precision: 0.001 },
   }));
 
   const updatePosition = (index: number) => {
@@ -63,13 +63,15 @@ export function Images({
 
       const containerWidth = containerRef.current.offsetWidth;
       const currentOffset = -currentIndex * containerWidth;
-      const proposedPosition = currentOffset + mx;
+
+      const dampedMx = mx / (Math.abs(mx) * 0.1 + 1);
+      const proposedPosition = currentOffset + dampedMx;
 
       if (active) {
-        api.start({ x: proposedPosition, immediate: true });
+        api.start({ x: proposedPosition, immediate: Math.abs(vx) > 1 });
       } else {
-        const moveThreshold = containerWidth * 0.2;
-        const velocityThreshold = 0.5;
+        const moveThreshold = containerWidth * 0.15;
+        const velocityThreshold = 0.3;
 
         const shouldMoveNext =
           (-mx > moveThreshold || vx < -velocityThreshold) &&
@@ -132,6 +134,7 @@ export function Images({
         {...(isMobile ? bind() : {})}
         className={cn(
           "absolute flex h-full",
+          "will-change-transform",
           isMobile ? "touch-pan-x" : "touch-none",
         )}
         style={{
@@ -141,19 +144,18 @@ export function Images({
       >
         {images.map((image, i) => (
           <div
-            key={image}
+            key={image.src}
             className={cn("relative h-full select-none")}
             style={{ width: `${imageWidth}%` }}
           >
             <Image
-              src={image}
+              src={image.src}
               alt={`Carousel image ${i + 1}`}
               fill
               sizes="420px"
-              priority={i === 0}
-              loading={i === 0 ? "eager" : "lazy"}
+              quality={50}
               placeholder="blur"
-              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIbGNtcwIQAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4eHRoaHSQtJSEkMjU1LC0vMjQ0ODQ2NDEzOj4+QUE+PzpHR0tLS0Y2RjZLS0tLS0v/2wBDARUXFx4aHjshITs7S0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0v/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAn/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAP/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+              blurDataURL={image.base64}
               className={cn("pointer-events-none object-cover")}
             />
           </div>
@@ -165,7 +167,7 @@ export function Images({
           onClick={() => handleImageChange("previous")}
           className={cn(
             "absolute left-3 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-xl",
-            "border border-white/40 bg-black/70 shadow-xl shadow-black/70 backdrop-blur-sm",
+            "border border-white/20 bg-black/70 shadow-xl shadow-black/70 backdrop-blur-sm",
             "transition-transform",
             "hover:scale-110",
           )}
@@ -180,7 +182,7 @@ export function Images({
           onClick={() => handleImageChange("next")}
           className={cn(
             "absolute right-3 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-xl",
-            "border border-white/40 bg-black/70 shadow-xl shadow-black/70 backdrop-blur-sm",
+            "border border-white/20 bg-black/70 shadow-xl shadow-black/70 backdrop-blur-sm",
             "transition-transform",
             "hover:scale-110",
           )}

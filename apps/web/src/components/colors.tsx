@@ -36,10 +36,10 @@ export function Colors({ colors }: { colors: AuraColor[] }) {
   });
 
   return (
-    <div className={cn("absolute bottom-full w-full p-3", "saturate-150")}>
-      <div className={cn("relative flex h-9 justify-between", "sm:h-11")}>
+    <div className={cn("absolute bottom-full w-full p-3")}>
+      <div className={cn("relative flex h-3 justify-between gap-3")}>
         {Array.from({ length: 6 }).map((_, index) => (
-          <div key={`color-${index}`} className={cn("relative w-9", "sm:w-11")}>
+          <div key={`color-${index}`} className={cn("relative w-full")}>
             {transitions((style, item) => {
               if (item.position !== index) return null;
 
@@ -48,7 +48,7 @@ export function Colors({ colors }: { colors: AuraColor[] }) {
                   key={item.hex}
                   className={cn(
                     "absolute inset-0 rounded-full",
-                    "border border-white/40 shadow-xl shadow-black/50",
+                    "shadow-lg shadow-black/30 brightness-150 saturate-150",
                   )}
                   style={{
                     ...style,
