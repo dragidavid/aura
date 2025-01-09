@@ -4,7 +4,7 @@
   </picture>
   
   <h1><b>Aura</b></h1>
-  <p>Extract beautiful color palettes from any image. Zero config, works everywhere.</p>
+  <p>Extract color palettes from any image. Zero config, works everywhere.</p>
 </div>
 
 <div align="center">
