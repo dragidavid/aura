@@ -1,10 +1,11 @@
 "use client";
 
 import { Suspense, useRef, useMemo, useCallback } from "react";
-import { Canvas, useFrame, extend } from "@react-three/fiber";
-import { useSpring, animated as a3 } from "@react-spring/three";
-import { useSpring as useWebSpring, animated } from "@react-spring/web";
-import { MathUtils, Mesh, AmbientLight } from "three";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
+import { motion as m3 } from "framer-motion-3d";
+import { motion } from "motion/react";
+import { MathUtils, Mesh } from "three";
 import {
   Icosahedron,
   Environment,
@@ -18,8 +19,6 @@ import { useIsMobile } from "@/hooks/use-is-mobile";
 import { cn } from "@/lib/cn";
 
 import type { AuraColor } from "@drgd/aura";
-
-extend({ AmbientLight });
 
 const Blob = ({
   colorIndex,
@@ -39,14 +38,9 @@ const Blob = ({
   isMobile: boolean;
 }) => {
   const mesh = useRef<Mesh>(null);
-  const currentColor = colors[Math.floor(colorIndex / 2)]?.hex || "#fff";
+  const blobColor = colors[Math.floor(colorIndex / 2)]?.hex || "#fff";
 
-  const { color } = useSpring({
-    color: currentColor,
-    config: { mass: 1.5, tension: 180, friction: 12 },
-  });
-
-  const animate = useCallback(
+  const updatePosition = useCallback(
     (time: number) => {
       if (!mesh.current) return;
 
@@ -58,7 +52,7 @@ const Blob = ({
         Math.cos(time * (speed * 0.8) + uniqueOffset) * (isMobile ? 0.4 : 0.5);
       const z =
         initialPosition[2] +
-        Math.sin(time * (speed * 0.5) + uniqueOffset) * 0.2;
+        Math.sin(time * (speed * 0.5) + uniqueOffset) * 0.8;
 
       mesh.current.position.set(x, y, z);
       mesh.current.rotation.x = Math.sin(time * 0.15 + uniqueOffset) * 0.1;
@@ -67,7 +61,7 @@ const Blob = ({
     [speed, initialPosition, uniqueOffset, isMobile],
   );
 
-  useFrame((state) => animate(state.clock.getElapsedTime()));
+  useFrame((state) => updatePosition(state.clock.getElapsedTime()));
 
   return (
     <Float
@@ -76,18 +70,17 @@ const Blob = ({
       floatIntensity={0.4}
       floatingRange={[-0.2, 0.2]}
     >
-      {/* @ts-expect-error - types are not fully compatible */}
-      <a3.mesh ref={mesh} scale={scale} position={initialPosition}>
-        <Icosahedron args={[1, 20]}>
-          {/* @ts-expect-error - types are not fully compatible */}
-          <a3.meshStandardMaterial
-            color={color}
+      <mesh ref={mesh} scale={scale} position={initialPosition}>
+        <Icosahedron args={[1, 16]}>
+          <m3.meshStandardMaterial
+            animate={{
+              color: blobColor,
+            }}
             roughness={0.8}
             metalness={0.2}
           />
         </Icosahedron>
-        {/* @ts-expect-error - types are not fully compatible */}
-      </a3.mesh>
+      </mesh>
     </Float>
   );
 };
@@ -100,8 +93,8 @@ export function Background({ colors }: { colors: AuraColor[] }) {
     return Array(totalBlobs)
       .fill(null)
       .map((_, index) => ({
-        speed: MathUtils.randFloat(0.15, 0.25),
-        scale: MathUtils.randFloat(isMobile ? 1.4 : 0.6, isMobile ? 1.8 : 0.8),
+        speed: MathUtils.randFloat(0.15, 0.45),
+        scale: MathUtils.randFloat(isMobile ? 1.4 : 0.5, isMobile ? 1.8 : 0.8),
         initialPosition: [
           MathUtils.randFloat(-0.8, 0.8),
           MathUtils.randFloat(isMobile ? -2 : -0.6, isMobile ? -1.7 : 0.6),
@@ -112,16 +105,12 @@ export function Background({ colors }: { colors: AuraColor[] }) {
       }));
   }, [colors.length, isMobile]);
 
-  const fadeIn = useWebSpring({
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-    config: { duration: 4000 },
-  });
-
   return (
     <Suspense fallback={null}>
-      <animated.div
-        style={fadeIn}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 3 }}
         className={cn("fixed inset-0 -z-10", "pointer-events-none")}
       >
         <Canvas
@@ -141,6 +130,7 @@ export function Background({ colors }: { colors: AuraColor[] }) {
           performance={{ min: 0.5 }}
         >
           <ambientLight intensity={1} />
+
           {blobConfigs.map((config, index) => (
             <Blob
               key={`blob-${index}`}
@@ -150,7 +140,18 @@ export function Background({ colors }: { colors: AuraColor[] }) {
               {...config}
             />
           ))}
+
+          <EffectComposer>
+            <Bloom
+              mipmapBlur={true}
+              luminanceThreshold={0.1}
+              intensity={1.44}
+              opacity={6.12}
+            />
+          </EffectComposer>
+
           <Preload all />
+
           <Environment resolution={256}>
             <group rotation={[-Math.PI / 3, 0, 1]}>
               <Lightformer
@@ -184,13 +185,13 @@ export function Background({ colors }: { colors: AuraColor[] }) {
             </group>
           </Environment>
         </Canvas>
-      </animated.div>
+      </motion.div>
 
       <div
         className={cn(
           "fixed inset-0 -z-10",
           "pointer-events-none",
-          "backdrop-blur-3xl backdrop-brightness-150 backdrop-saturate-150",
+          "backdrop-blur-3xl backdrop-brightness-125 backdrop-saturate-200",
         )}
       />
     </Suspense>
