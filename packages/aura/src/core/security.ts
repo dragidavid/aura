@@ -9,75 +9,106 @@ const ALLOWED_IMAGE_TYPES = [
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 
 /**
- * Validates image URLs and checks CORS/content type
- * Falls back to GET request if HEAD is not allowed
+ * Validates image URLs for security and compatibility.
+ * Checks URL structure, protocol, content-type, size limits, and CORS.
+ *
+ * @param url - URL to validate
+ * @returns Promise resolving to true if valid
+ * @throws {Error} with standardized message if validation fails
  */
 export async function validateImageUrl(url: string): Promise<boolean> {
   try {
-    const parsed = new URL(url);
+    let parsed: URL;
 
-    // Only allow https or data URLs
-    if (!(parsed.protocol === "https:" || url.startsWith("data:"))) {
-      throw new Error("Only HTTPS or data URLs are supported");
+    try {
+      parsed = new URL(url);
+    } catch {
+      throw new Error("Invalid image URL format");
     }
 
-    // For data URLs, validate mime type
+    if (!(parsed.protocol === "https:" || url.startsWith("data:"))) {
+      throw new Error("Only HTTPS and data URLs are supported");
+    }
+
+    // Handle data URLs
     if (url.startsWith("data:")) {
       const mime = url.split(",")[0]?.split(":")[1]?.split(";")[0];
+
       if (!mime || !ALLOWED_IMAGE_TYPES.includes(mime)) {
-        throw new Error("Invalid image type");
+        throw new Error(
+          `Invalid image type. Supported types: ${ALLOWED_IMAGE_TYPES.join(", ")}`
+        );
       }
 
       return true;
     }
 
-    // Try HEAD request first
     try {
+      // Try HEAD request first
       const headResponse = await fetch(url, {
         method: "HEAD",
         headers: { Accept: "image/*" },
+        mode: "cors",
+        credentials: "omit", // Prevent sending cookies for security
       });
 
       if (headResponse.ok) {
         const contentType = headResponse.headers.get("content-type");
-        if (!contentType || !ALLOWED_IMAGE_TYPES.includes(contentType)) {
-          throw new Error("Invalid image type");
+
+        if (
+          !contentType ||
+          !ALLOWED_IMAGE_TYPES.includes(contentType.toLowerCase())
+        ) {
+          throw new Error(
+            `Invalid image type. Supported types: ${ALLOWED_IMAGE_TYPES.join(", ")}`
+          );
         }
 
         const contentLength = headResponse.headers.get("content-length");
+
         if (contentLength && parseInt(contentLength) > MAX_IMAGE_SIZE) {
-          throw new Error("Image size exceeds maximum allowed size");
+          throw new Error(
+            `Image size exceeds maximum allowed size of ${MAX_IMAGE_SIZE / (1024 * 1024)}MB`
+          );
         }
 
         return true;
       }
     } catch (headError) {
-      // HEAD request failed, fall back to GET
+      // HEAD request failed, fall back to GET with range
       console.warn("HEAD request failed, falling back to GET request");
     }
 
-    // Fall back to GET request with range header to minimize data transfer
+    // Fallback: GET request with range header
     const response = await fetch(url, {
       method: "GET",
       headers: {
         Accept: "image/*",
         Range: "bytes=0-1024", // Only request first KB to check type
       },
+      mode: "cors",
+      credentials: "omit",
     });
 
-    if (!response.ok) throw new Error("Image URL is not accessible");
-
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !ALLOWED_IMAGE_TYPES.includes(contentType)) {
-      throw new Error("Invalid image type");
+    if (!response.ok) {
+      throw new Error(`Image is not accessible (HTTP ${response.status})`);
     }
 
-    // For GET requests, we might not get content-length due to Range header
-    // So we'll need to trust the server's content-type
+    const contentType = response.headers.get("content-type");
+
+    if (
+      !contentType ||
+      !ALLOWED_IMAGE_TYPES.includes(contentType.toLowerCase())
+    ) {
+      throw new Error(
+        `Unsupported image type. Allowed: ${ALLOWED_IMAGE_TYPES.join(", ")}`
+      );
+    }
+
     return true;
   } catch (error) {
     throw new Error(
-      `Invalid image URL: ${error instanceof Error ? error.message : "Unknown error"}`
+      `Image validation failed: ${error instanceof Error ? error.message : "Unknown error"}`
     );
   }
 }

@@ -10,13 +10,12 @@ const memoizedDistance = (color: Color, centroid: Color): number => {
 };
 
 /**
- * Implements k-means clustering algorithm with k-means++ initialization.
- * This algorithm finds k representative colors from the input color set.
+ * Implements k-means clustering with k-means++ initialization to find representative colors.
  *
  * @param colors - Array of Color objects to cluster
- * @param k - Number of clusters (colors) to generate
- * @param maxIterations - Maximum number of iterations to perform
- * @returns Array of k representative colors
+ * @param k - Number of clusters to generate
+ * @param maxIterations - Maximum iterations (default: 20)
+ * @returns Array of representative colors
  */
 export function kMeansClustering(
   colors: Color[],
@@ -49,6 +48,7 @@ export function kMeansClustering(
     const random = Math.random() * sum;
 
     let acc = 0;
+
     for (let i = 0; i < distances.length; i++) {
       acc += distances[i] ?? 0;
       if (acc >= random) {
@@ -96,14 +96,17 @@ export function kMeansClustering(
     // Calculate new centroids
     const newCentroids = clusters.map((cluster) => {
       if (cluster.length === 0) return currentCentroids[0];
+
       const avg = Color.average(cluster);
       avg.count = cluster.reduce((sum, color) => sum + color.count, 0);
+
       return avg;
     });
 
     // Check for convergence
     const hasConverged = currentCentroids.every((centroid, i) => {
       const newCentroid = newCentroids[i];
+
       return (
         centroid.r === newCentroid?.r &&
         centroid.g === newCentroid?.g &&
