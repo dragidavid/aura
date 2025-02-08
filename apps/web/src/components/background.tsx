@@ -110,7 +110,7 @@ export function Background({ colors }: { colors: AuraColor[] }) {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 3 }}
+        transition={{ duration: 2, delay: 1 }}
         className={cn("fixed inset-0 -z-10", "pointer-events-none")}
       >
         <Canvas
@@ -145,7 +145,7 @@ export function Background({ colors }: { colors: AuraColor[] }) {
             <Bloom
               mipmapBlur={true}
               luminanceThreshold={0.1}
-              intensity={1.44}
+              intensity={1.48}
               opacity={6.12}
             />
           </EffectComposer>
