@@ -13,8 +13,8 @@ export async function HeaderButtons() {
         target="_blank"
         className={cn(
           "h-8 rounded-full px-[5px]",
-          "border border-dashed border-white/20",
-          "hover:border-solid hover:bg-white/10",
+          "border border-dashed border-white/20 bg-white/10",
+          "hover:border-white",
           data?.stargazers_count && "pr-2",
         )}
       >
@@ -36,8 +36,8 @@ export async function HeaderButtons() {
         target="_blank"
         className={cn(
           "h-8 rounded-full px-[5px]",
-          "border border-dashed border-white/20",
-          "hover:border-solid hover:bg-white/10",
+          "border border-dashed border-white/20 bg-white/10",
+          "hover:border-white",
         )}
       >
         <span className={cn("flex h-full items-center")}>
