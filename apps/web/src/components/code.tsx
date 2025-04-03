@@ -9,25 +9,25 @@ import { cn } from "@/lib/cn";
 const theme = {
   plain: {
     color: "var(--color-white)",
-    fontSize: "var(--text-sm)",
+    fontSize: "13px",
   },
   styles: [
     {
       types: ["comment"],
       style: {
-        color: "var(--color-zinc-300)",
+        color: "color-mix(in oklab, var(--color-white) 74%, transparent)",
       },
     },
     {
       types: ["atrule", "keyword", "attr-name", "selector", "string"],
       style: {
-        color: "var(--color-zinc-400)",
+        color: "color-mix(in oklab, var(--color-white) 61%, transparent)",
       },
     },
     {
       types: ["punctuation", "operator"],
       style: {
-        color: "var(--color-zinc-300)",
+        color: "color-mix(in oklab, var(--color-white) 74%, transparent)",
       },
     },
     {
@@ -59,9 +59,10 @@ export function Code({ code, language = "jsx" }: Props) {
     <div className={cn("group relative")}>
       <button
         className={cn(
-          "absolute top-3 right-3 z-10 grid size-6 place-items-center rounded-md",
+          "absolute top-4 right-4 z-10 grid size-7 place-items-center rounded-md",
           "border border-white/20 bg-black opacity-0",
-          "transition-opacity duration-200",
+          "transition-opacity,colors duration-150",
+          "hover:cursor-pointer hover:bg-white/10",
           "group-hover:opacity-100",
         )}
         onClick={onCopy}
@@ -105,8 +106,8 @@ export function Code({ code, language = "jsx" }: Props) {
           <pre
             style={style}
             className={cn(
-              "overflow-x-scroll rounded-lg p-3",
-              "bg-radial-[at_-10%_-20%] from-zinc-800 to-black [background-size:170%_120%]",
+              "overflow-x-scroll rounded-lg p-5",
+              "bg-radial-[at_-10%_-20%] from-white/17 to-black [background-size:170%_120%]",
             )}
           >
             {tokens.map((line, i) => (

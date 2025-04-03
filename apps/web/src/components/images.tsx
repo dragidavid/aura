@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useCallback, useState } from "react";
 import Image from "next/image";
-import { motion, useMotionValue, useAnimation } from "motion/react";
+import useEmblaCarousel from "embla-carousel-react";
 
 import { Colors } from "@/components/colors";
 import { Background } from "@/components/background";
@@ -20,136 +20,54 @@ export function Images({
   images: { src: string; base64: string }[];
   preloadedColors: Record<number, AuraColor[]>;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-
-  const controls = useAnimation();
-  const x = useMotionValue(0);
-
   const { isMobile } = useIsMobile();
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const imageWidth = 100;
-  const totalWidth = imageWidth * images.length;
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    axis: "x",
+    skipSnaps: false,
+    dragFree: false,
+    align: "center",
+    containScroll: false,
+  });
 
-  const updatePosition = useCallback(
-    (index: number) => {
-      if (!containerRef.current) return;
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
 
-      const containerWidth = containerRef.current.offsetWidth;
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
 
-      controls.start({
-        x: -index * containerWidth,
-        transition: { type: "tween", ease: "easeOut", duration: 0.2 },
-      });
-    },
-    [controls],
-  );
-
-  const handleImageChange = useCallback(
-    (dir: "next" | "previous") => {
-      if (dir === "next") {
-        if (currentIndex < images.length - 1) {
-          setCurrentIndex(currentIndex + 1);
-        }
-      } else {
-        if (currentIndex > 0) {
-          setCurrentIndex(currentIndex - 1);
-        }
-      }
-    },
-    [currentIndex, images.length],
-  );
-
-  const handleDragEnd = useCallback(
-    (
-      _: MouseEvent | TouchEvent | PointerEvent,
-      info: { offset: { x: number }; velocity: { x: number } },
-    ) => {
-      if (!containerRef.current) return;
-
-      const containerWidth = containerRef.current.offsetWidth;
-      const moveThreshold = containerWidth * 0.15;
-      const velocityThreshold = 200;
-
-      const offsetX = Math.abs(info.offset.x);
-      const velocityX = Math.abs(info.velocity.x);
-      const direction = info.offset.x < 0 ? 1 : -1;
-
-      const shouldSwipe =
-        (offsetX > moveThreshold || velocityX > velocityThreshold) &&
-        ((direction > 0 && currentIndex < images.length - 1) ||
-          (direction < 0 && currentIndex > 0));
-
-      if (shouldSwipe) {
-        setCurrentIndex((prev) => prev + direction);
-      } else {
-        updatePosition(currentIndex);
-      }
-    },
-    [currentIndex, images.length, updatePosition],
-  );
-
-  const motionProps = useMemo(
-    () => ({
-      drag: isMobile ? ("x" as const) : false,
-      dragConstraints: containerRef,
-      dragMomentum: true,
-      dragDirectionLock: true,
-      dragTransition: { bounceStiffness: 600, bounceDamping: 20 },
-      onDragStart: () => setIsDragging(true),
-      onDragEnd: (
-        e: MouseEvent | TouchEvent | PointerEvent,
-        info: { offset: { x: number }; velocity: { x: number } },
-      ) => {
-        setIsDragging(false);
-        handleDragEnd(e, info);
-      },
-      animate: controls,
-      initial: false,
-      style: {
-        width: `${totalWidth}%`,
-        x,
-      },
-      className: cn(
-        "absolute flex h-full",
-        "will-change-transform",
-        isMobile ? "touch-pan-x" : "touch-none",
-      ),
-    }),
-    [controls, handleDragEnd, isMobile, totalWidth, x],
-  );
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCurrentIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!emblaApi) return;
 
-    const resizeObserver = new ResizeObserver(() => {
-      updatePosition(currentIndex);
-    });
-
-    resizeObserver.observe(containerRef.current);
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
 
     return () => {
-      resizeObserver.disconnect();
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
     };
-  }, [currentIndex, updatePosition]);
+  }, [emblaApi, onSelect]);
 
-  useEffect(() => {
-    updatePosition(currentIndex);
-  }, [currentIndex, updatePosition]);
-
+  // Preload adjacent images
   useEffect(() => {
     const preloadImage = (src: string) => {
       const img = document.createElement("img");
-
       img.src = src;
     };
 
     if (currentIndex > 0) {
       preloadImage(images[currentIndex - 1].src);
     }
-
     if (currentIndex < images.length - 1) {
       preloadImage(images[currentIndex + 1].src);
     }
@@ -158,53 +76,54 @@ export function Images({
   if (images.length === 0) return null;
 
   return (
-    <div ref={containerRef} className={cn("relative size-full")}>
+    <div className={cn("relative size-full")}>
       <Background colors={preloadedColors[currentIndex]} />
-
       <Colors colors={preloadedColors[currentIndex]} />
 
-      <motion.div {...motionProps}>
-        {images.map((image, i) => (
-          <div
-            key={image.src}
-            className={cn(
-              "relative h-full select-none",
-              "transition-all duration-200",
-              i !== currentIndex && "brightness-50 saturate-0",
-            )}
-            style={{ width: `${imageWidth}%` }}
-          >
-            <Image
-              src={image.src}
-              alt={`Carousel image ${i + 1}`}
-              fill
-              priority={i === 0}
-              loading={i === 0 ? "eager" : "lazy"}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              quality={30}
-              placeholder="blur"
-              blurDataURL={image.base64}
-              className={cn("pointer-events-none object-cover")}
-            />
-
+      <div ref={emblaRef} className={cn("size-full overflow-visible")}>
+        <div className={cn("flex h-full touch-pan-y")}>
+          {images.map((image, i) => (
             <div
+              key={image.src}
               className={cn(
-                "absolute inset-0",
-                "bg-gradient-to-t from-black/40 to-transparent",
+                "relative h-full w-full shrink-0 px-4 select-none",
+                "transition-all duration-500 ease-out",
+                i !== currentIndex && "scale-[0.85] brightness-50 saturate-0",
               )}
-            />
-          </div>
-        ))}
-      </motion.div>
+            >
+              <Image
+                src={image.src}
+                alt={`Carousel image ${i + 1}`}
+                fill
+                priority={i === 0}
+                loading={i === 0 ? "eager" : "lazy"}
+                sizes="100vw"
+                quality={30}
+                placeholder="blur"
+                blurDataURL={image.base64}
+                className={cn(
+                  "pointer-events-none object-cover",
+                  "transition-transform duration-500 ease-out",
+                )}
+              />
+              <div
+                className={cn(
+                  "absolute inset-0",
+                  "bg-gradient-to-t from-black/40 to-transparent",
+                )}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
 
       {currentIndex > 0 && (
         <button
-          onClick={() => handleImageChange("previous")}
+          onClick={scrollPrev}
           className={cn(
-            "absolute top-1/2 left-3 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-xl",
+            "absolute top-1/2 left-6 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-xl",
             "border border-white/20 bg-black/60 shadow-xl shadow-black/20 backdrop-blur-lg",
-            "hover:border-white",
-            isDragging && "pointer-events-none",
+            "transition-colors hover:border-white",
           )}
           aria-label="Previous image"
         >
@@ -214,12 +133,11 @@ export function Images({
 
       {currentIndex < images.length - 1 && (
         <button
-          onClick={() => handleImageChange("next")}
+          onClick={scrollNext}
           className={cn(
-            "absolute top-1/2 right-3 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-xl",
+            "absolute top-1/2 right-6 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-xl",
             "border border-white/20 bg-black/60 shadow-xl shadow-black/20 backdrop-blur-lg",
-            "hover:border-white",
-            isDragging && "pointer-events-none",
+            "transition-colors hover:border-white",
           )}
           aria-label="Next image"
         >

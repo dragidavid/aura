@@ -1,10 +1,10 @@
 import { getAura } from "@drgd/aura/server";
 import { getPlaiceholder } from "plaiceholder";
 
+import { Frame } from "@/components/frame";
 import { Images } from "@/components/images";
 
-import { Frame } from "@/components/ui/frame";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 

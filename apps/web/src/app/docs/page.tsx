@@ -1,11 +1,273 @@
-import { Metadata } from "next";
+import { cn } from "@/lib/cn";
+
+import { Code } from "@/components/code";
+import { Demo } from "@/components/demo";
+import { Channel } from "@/components/channel";
+
+import type { Metadata } from "next";
+
+const BASIC_USAGE_CLIENT = `import { useAura } from "@drgd/aura/client";
+
+export function Colors() {
+  const { colors, isLoading, error } = useAura("https://picsum.photos/200", {
+    paletteSize: 6,
+    onError: (error) => console.error(error)
+  });
+
+  if (isLoading) return <p>Loading...</p>;
+
+  if (error) return <p>Error: {error.message}</p>;
+
+  return (
+    <ul>
+      {colors.map((color) => (
+        <li key={color.hex}>
+          {color.hex} - {Math.round(color.weight * 100)}%
+        </li>
+      ))}
+    </ul>
+  );
+}`;
+
+const USAGE_SERVER = `import { getAura } from "@drgd/aura/server";
+
+// Basic usage
+const colors = await getAura("https://picsum.photos/200");
+
+// Advanced usage with options
+const colors = await getAura("https://picsum.photos/200", {
+  paletteSize: 6,
+  quality: "high",
+  timeout: 15000,
+  fallbackColors: [
+    { hex: "#FF0000", weight: 0.5 },
+    { hex: "#00FF00", weight: 0.5 }
+  ]
+});`;
 
 export const metadata: Metadata = {
-  title: "Aura Docs",
+  title: "Aura Documentation",
   description:
     "Extract color palettes from any image. Zero config, works everywhere.",
 };
 
 export default function Page() {
-  return <div>Docs</div>;
+  return (
+    <Channel>
+      <div className={cn("flex flex-col gap-10 p-3", "sm:p-6")}>
+        <div>
+          <h3 className={cn("my-3 font-sans text-lg font-bold")}>
+            Installation
+          </h3>
+          <Code code="npm install @drgd/aura" language="bash" />
+        </div>
+
+        <div>
+          <div
+            className={cn(
+              "text-2xs flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
+              "bg-emerald-400 text-emerald-900",
+            )}
+          >
+            <span>client</span>
+          </div>
+
+          <h3 className={cn("my-3 font-sans text-lg font-bold")}>
+            Basic Usage
+          </h3>
+
+          <p className={cn("mb-5", "text-white/60")}>
+            Use the <code>useAura</code> hook to extract colors in React
+            components:
+          </p>
+
+          <Code code={BASIC_USAGE_CLIENT} />
+
+          <h3 className={cn("mt-6 mb-3 font-sans font-bold")}>
+            <code className="text-lg">useAura</code>
+          </h3>
+
+          <p className={cn("mb-5", "text-white/60")}>
+            React hook for client-side color extraction with built-in loading
+            and error states.
+          </p>
+
+          <div className={cn("space-y-3", "text-white/60")}>
+            <p className={cn("font-medium", "text-white")}>Parameters:</p>
+            <ul className={cn("list-disc space-y-3 pl-6")}>
+              <li>
+                <code>imageUrl</code>: URL of the image (required)
+              </li>
+              <li>
+                <code>options</code>:
+                <ul className={cn("mt-3 list-disc space-y-3 pl-6")}>
+                  <li>
+                    <code>paletteSize</code>: Number of colors to extract
+                    (default: 6, range: 1-12)
+                  </li>
+                  <li>
+                    <code>fallbackColors</code>: Custom fallback colors array
+                  </li>
+                  <li>
+                    <code>onError</code>: Error callback function
+                  </li>
+                </ul>
+              </li>
+            </ul>
+
+            <p className={cn("font-medium", "text-white")}>Returns:</p>
+            <ul className={cn("list-disc space-y-3 pl-6")}>
+              <li>
+                <code>colors</code>: Array of <code>AuraColor</code> objects
+              </li>
+              <li>
+                <code>isLoading</code>: Boolean indicating extraction status
+              </li>
+              <li>
+                <code>error</code>: Error object if failed, <code>null</code>{" "}
+                otherwise
+              </li>
+            </ul>
+          </div>
+
+          <h3 className={cn("mt-6 mb-3 font-sans text-lg font-bold")}>Demo</h3>
+
+          <Demo />
+        </div>
+
+        <div>
+          <div
+            className={cn(
+              "text-2xs flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
+              "bg-rose-400 text-rose-900",
+            )}
+          >
+            <span>server</span>
+          </div>
+
+          <h3 className={cn("my-3 font-sans text-lg font-bold")}>Usage</h3>
+
+          <p className={cn("mb-5", "text-white/60")}>
+            Use the <code>getAura</code> function to extract colors on the
+            server:
+          </p>
+
+          <Code code={USAGE_SERVER} />
+
+          <h3 className={cn("mt-6 mb-3 font-sans font-bold")}>
+            <code className="text-lg">getAura</code>
+          </h3>
+
+          <p className={cn("mb-5", "text-white/60")}>
+            Server-side function that extracts colors from an image URL using{" "}
+            <a
+              href="https://github.com/lovell/sharp"
+              target="_blank"
+              className={cn("underline underline-offset-2", "text-white")}
+            >
+              Sharp ↗
+            </a>
+            .
+          </p>
+
+          <div className={cn("space-y-3", "text-white/60")}>
+            <p className={cn("font-medium", "text-white")}>Parameters:</p>
+            <ul className={cn("list-disc space-y-3 pl-6")}>
+              <li>
+                <code>imageUrl</code>: URL of the image (required)
+              </li>
+              <li>
+                <code>options</code>:
+                <ul className={cn("mt-3 list-disc space-y-3 pl-6")}>
+                  <li>
+                    <code>paletteSize</code>: Number of colors to extract
+                    (default: 6, range: 1-12)
+                  </li>
+                  <li>
+                    <code>quality</code>: "low" (200px) | "medium" (400px) |
+                    "high" (800px)
+                  </li>
+                  <li>
+                    <code>timeout</code>: Maximum processing time in ms
+                    (default: 10000)
+                  </li>
+                  <li>
+                    <code>fallbackColors</code>: Custom fallback colors array
+                  </li>
+                  <li>
+                    <code>validateUrl</code>: Enable URL validation (default:
+                    true)
+                  </li>
+                </ul>
+              </li>
+            </ul>
+
+            <p className={cn("font-medium", "text-white")}>Returns:</p>
+            <ul className={cn("list-disc space-y-3 pl-6")}>
+              <li>
+                <code>Promise&lt;AuraColor[]&gt;</code>: Array of colors, where
+                each has:
+                <ul className={cn("mt-3 list-disc space-y-3 pl-6")}>
+                  <li>
+                    <code>hex</code>: Hexadecimal color code (e.g., "#FF0000")
+                  </li>
+                  <li>
+                    <code>weight</code>: Color prevalence (0-1)
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <div
+            className={cn(
+              "text-2xs flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
+              "bg-white/70 text-black/60",
+            )}
+          >
+            <span>general</span>
+          </div>
+
+          <h3 className={cn("my-3 font-sans text-lg font-bold")}>
+            Error handling & using fallbacks
+          </h3>
+
+          <p className={cn("mb-5", "text-white/60")}>
+            Both implementations include built-in error handling with fallback
+            colors:
+          </p>
+
+          <ul className={cn("list-disc space-y-3 pl-6", "text-white/60")}>
+            <li>Invalid image URLs</li>
+            <li>Network errors</li>
+            <li>Timeout errors (10s default)</li>
+            <li>Invalid image types</li>
+            <li>CORS errors</li>
+          </ul>
+
+          <div className={cn("mt-5")}>
+            <Code
+              code={`// Custom fallback colors
+const fallbackColors = [
+  { hex: "#FF0000", weight: 0.4 }, // Red
+  { hex: "#00FF00", weight: 0.3 }, // Green
+  { hex: "#0000FF", weight: 0.3 }  // Blue
+];
+
+// Server-side usage
+const colors = await getAura(imageUrl, 3, { fallbackColors });
+
+// Client-side usage
+const { colors } = useAura(imageUrl, 3, { 
+  fallbackColors,
+  onError: (error) => console.error(error)
+});`}
+            />
+          </div>
+        </div>
+      </div>
+    </Channel>
+  );
 }
