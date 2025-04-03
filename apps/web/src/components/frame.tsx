@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Logo } from "@/components/app-logo";
+import { Logo } from "@/components/logo";
 import { HeaderButtons } from "@/components/header-buttons";
 
 import { cn } from "@/lib/cn";
