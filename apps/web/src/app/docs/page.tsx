@@ -30,20 +30,36 @@ export function Colors() {
 }`;
 
 const USAGE_SERVER = `import { getAura } from "@drgd/aura/server";
+import { Suspense } from "react";
 
-// Basic usage
-const colors = await getAura("https://picsum.photos/200");
+// Server Component that gets the colors
+async function Colors({ imageUrl }) {
+  const colors = await getAura(imageUrl);
 
-// Advanced usage with options
-const colors = await getAura("https://picsum.photos/200", {
-  paletteSize: 6,
-  quality: "high",
-  timeout: 15000,
-  fallbackColors: [
-    { hex: "#FF0000", weight: 0.5 },
-    { hex: "#00FF00", weight: 0.5 }
-  ]
-});`;
+  return (
+    <ul>
+      {colors.map((color) => (
+        <li key={color.hex} style={{ color: color.hex }}>
+          {color.hex} ({Math.round(color.weight * 100)}%)
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// Parent Server Component
+export default async function Page() {
+  const imageUrl = "https://example.com/image.jpg";
+
+  return (
+    <div>
+      <h1>Image Colors</h1>
+      <Suspense fallback={<p>Loading colors...</p>}>
+        <Colors imageUrl={imageUrl} />
+      </Suspense>
+    </div>
+  );
+}`;
 
 export const metadata: Metadata = {
   title: "Aura Documentation",
@@ -59,7 +75,11 @@ export default function Page() {
           <h3 className={cn("my-3 font-sans text-lg font-bold")}>
             Installation
           </h3>
-          <Code code="npm install @drgd/aura" language="bash" />
+          <Code code="pnpm add @drgd/aura sharp" language="bash" />
+          <p className={cn("mt-3 text-sm", "text-white/60")}>
+            Note: Server-side usage requires the peer dependency `sharp` to be
+            installed as shown above.
+          </p>
         </div>
 
         <div>
@@ -148,8 +168,10 @@ export default function Page() {
           <h3 className={cn("my-3 font-sans text-lg font-bold")}>Usage</h3>
 
           <p className={cn("mb-5", "text-white/60")}>
-            Use the <code>getAura</code> function to extract colors on the
-            server:
+            Use the <code>getAura</code> function inside an async Server
+            Component. To prevent blocking the initial page load while colors
+            are extracted, wrap the component calling{" "}
+            <code>await getAura(...)</code> in <code>&lt;Suspense&gt;</code>.
           </p>
 
           <Code code={USAGE_SERVER} />
