@@ -16,11 +16,17 @@
 
 ## Install
 
-To start using Aura, you need to install the package.
+To get started, install the required dependencies:
 
 ```bash
-npm install @drgd/aura
+npm install @drgd/aura sharp
+# or
+yarn add @drgd/aura sharp
+# or
+pnpm add @drgd/aura sharp
 ```
+
+**Note:** The server-side functionality relies on the `sharp` library. Please refer to the [official `sharp` installation documentation](https://sharp.pixelplumbing.com/install) for platform-specific requirements if you encounter installation issues.
 
 ## Usage
 
@@ -28,20 +34,38 @@ Then you can use the `getAura` function (server-side) or `useAura` hook (client-
 
 ### Server-side
 
+Use `getAura` inside an `async` Server Component. Wrap the component in `<Suspense>` to avoid blocking the initial page load.
+
 ```tsx
 import { getAura } from "@drgd/aura/server";
+import { Suspense } from "react";
 
-export async function Colors() {
-  const colors = await getAura("https://example.com/image.jpg");
+// Server Component that gets the colors
+async function Colors({ imageUrl }) {
+  const colors = await getAura(imageUrl);
 
   return (
     <ul>
       {colors.map((color) => (
-        <li key={color.hex}>
-          {color.hex} - {color.weight}
+        <li key={color.hex} style={{ color: color.hex }}>
+          {color.hex} ({Math.round(color.weight * 100)}%)
         </li>
       ))}
     </ul>
+  );
+}
+
+// Parent Server Component
+export default async function Page() {
+  const imageUrl = "https://example.com/image.jpg";
+
+  return (
+    <div>
+      <h1>Image Colors</h1>
+      <Suspense fallback={<p>Loading colors...</p>}>
+        <Colors imageUrl={imageUrl} />
+      </Suspense>
+    </div>
   );
 }
 ```
