@@ -2,7 +2,6 @@ import { cn } from "@/lib/cn";
 
 import { Code } from "@/components/code";
 import { Demo } from "@/components/demo";
-import { Channel } from "@/components/channel";
 
 import type { Metadata } from "next";
 
@@ -69,27 +68,33 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <Channel>
-      <div className={cn("flex flex-col gap-10 p-3", "sm:p-6")}>
+    <div className={cn("fixed inset-0 overflow-y-auto px-4 pt-18 pb-4")}>
+      <div className={cn("mx-auto flex w-full max-w-2xl flex-col gap-12")}>
         <div>
           <h3 className={cn("my-3 font-sans text-lg font-bold")}>
             Installation
           </h3>
           <Code code="pnpm add @drgd/aura sharp" language="bash" />
           <p className={cn("mt-3 text-sm", "text-white/60")}>
-            Note: Server-side usage requires the peer dependency `sharp` to be
-            installed as shown above.
+            Note: Server-side usage requires the peer dependency{" "}
+            <code>sharp</code> to be installed as shown above.
           </p>
         </div>
 
         <div>
           <div
             className={cn(
-              "text-2xs flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
-              "bg-emerald-400 text-emerald-900",
+              "text-2xs relative flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
+              "bg-emerald-400/40 text-emerald-500",
             )}
           >
             <span>client</span>
+            <div
+              className={cn(
+                "absolute left-full h-px w-2xl",
+                "bg-gradient-to-r from-emerald-400/40 to-transparent",
+              )}
+            />
           </div>
 
           <h3 className={cn("my-3 font-sans text-lg font-bold")}>
@@ -158,11 +163,17 @@ export default function Page() {
         <div>
           <div
             className={cn(
-              "text-2xs flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
-              "bg-rose-400 text-rose-900",
+              "text-2xs relative flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
+              "bg-rose-400/40 text-rose-500",
             )}
           >
             <span>server</span>
+            <div
+              className={cn(
+                "absolute left-full h-px w-2xl",
+                "bg-gradient-to-r from-rose-400/40 to-transparent",
+              )}
+            />
           </div>
 
           <h3 className={cn("my-3 font-sans text-lg font-bold")}>Usage</h3>
@@ -245,11 +256,17 @@ export default function Page() {
         <div>
           <div
             className={cn(
-              "text-2xs flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
-              "bg-white/70 text-black/60",
+              "text-2xs relative flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
+              "bg-white/70 text-black/70",
             )}
           >
             <span>general</span>
+            <div
+              className={cn(
+                "absolute left-full h-px w-2xl",
+                "bg-gradient-to-r from-white/70 to-transparent",
+              )}
+            />
           </div>
 
           <h3 className={cn("my-3 font-sans text-lg font-bold")}>
@@ -290,6 +307,6 @@ const { colors } = useAura(imageUrl, 3, {
           </div>
         </div>
       </div>
-    </Channel>
+    </div>
   );
 }

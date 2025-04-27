@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useRef, useMemo, useCallback } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { motion as m3 } from "framer-motion-3d";
 import { motion } from "motion/react";
@@ -76,8 +76,8 @@ const Blob = ({
             animate={{
               color: blobColor,
             }}
-            roughness={0.8}
-            metalness={0.2}
+            roughness={0.65}
+            metalness={0.9}
           />
         </Icosahedron>
       </mesh>
@@ -85,25 +85,123 @@ const Blob = ({
   );
 };
 
-export function Background({ colors }: { colors: AuraColor[] }) {
-  const { isMobile } = useIsMobile();
+function Scene({
+  colors,
+  isMobile,
+}: {
+  colors: AuraColor[];
+  isMobile: boolean;
+}) {
+  const { viewport } = useThree();
 
   const blobConfigs = useMemo(() => {
     const totalBlobs = colors.length * 2;
+
     return Array(totalBlobs)
       .fill(null)
-      .map((_, index) => ({
-        speed: MathUtils.randFloat(0.15, 0.45),
-        scale: MathUtils.randFloat(isMobile ? 1.4 : 0.5, isMobile ? 1.8 : 0.8),
-        initialPosition: [
-          MathUtils.randFloat(-0.8, 0.8),
-          MathUtils.randFloat(isMobile ? -2 : -0.6, isMobile ? -1.7 : 0.6),
-          MathUtils.randFloat(-0.3, 0.3),
-        ] as [number, number, number],
-        uniqueOffset: Math.random() * Math.PI * 2,
-        intensity: index % 2 === 0 ? 1 : 0.7,
-      }));
+      .map((_, index) => {
+        const scaleMultiplier = MathUtils.randFloat(
+          isMobile ? 0.7 : 0.9,
+          isMobile ? 1.1 : 1.4,
+        );
+
+        const relativeInitialX = isMobile
+          ? MathUtils.randFloat(-0.5, 0.5)
+          : MathUtils.randFloat(-1 / 6, 1 / 6);
+        const relativeInitialY = MathUtils.randFloat(-0.4, 0.4);
+        const initialZ = MathUtils.randFloat(-1, 1);
+
+        return {
+          speed: MathUtils.randFloat(0.1, 0.3),
+          scaleMultiplier: scaleMultiplier,
+          relativeInitialX: relativeInitialX,
+          relativeInitialY: relativeInitialY,
+          initialZ: initialZ,
+          uniqueOffset: Math.random() * Math.PI * 2,
+        };
+      });
   }, [colors.length, isMobile]);
+
+  const baseScale = Math.min(viewport.width, viewport.height) * 0.15;
+
+  return (
+    <>
+      <ambientLight intensity={1} />
+
+      {blobConfigs.map((config, index) => {
+        const currentScale = baseScale * config.scaleMultiplier;
+        const currentInitialX =
+          config.relativeInitialX *
+          (isMobile ? viewport.width : viewport.width);
+        const currentInitialY = config.relativeInitialY * viewport.height;
+        const currentInitialPosition: [number, number, number] = [
+          currentInitialX,
+          currentInitialY,
+          config.initialZ,
+        ];
+
+        return (
+          <Blob
+            key={`blob-${index}`}
+            colors={colors}
+            colorIndex={index}
+            isMobile={isMobile}
+            speed={config.speed}
+            scale={currentScale}
+            initialPosition={currentInitialPosition}
+            uniqueOffset={config.uniqueOffset}
+          />
+        );
+      })}
+
+      <EffectComposer>
+        <Bloom
+          mipmapBlur={true}
+          luminanceThreshold={0.1}
+          intensity={isMobile ? 1.32 : 1.58}
+        />
+      </EffectComposer>
+
+      <Preload all />
+
+      <Environment resolution={256}>
+        <group rotation={[-Math.PI / 3, 0, 1]}>
+          <Lightformer
+            form="circle"
+            intensity={100}
+            rotation-x={Math.PI / 2}
+            position={[0, 5, -9]}
+            scale={2}
+          />
+          <Lightformer
+            form="circle"
+            intensity={2}
+            rotation-y={Math.PI / 2}
+            position={[-5, 1, -1]}
+            scale={2}
+          />
+          <Lightformer
+            form="circle"
+            intensity={2}
+            rotation-y={-Math.PI / 2}
+            position={[10, 1, 0]}
+            scale={8}
+          />
+          <Lightformer
+            form="ring"
+            color="#fff"
+            intensity={80}
+            position={[10, 10, 0]}
+            scale={10}
+          />
+        </group>
+      </Environment>
+    </>
+  );
+}
+
+export function Background({ colors }: { colors: AuraColor[] }) {
+  const { isMobile } = useIsMobile();
 
   return (
     <Suspense fallback={null}>
@@ -129,61 +227,7 @@ export function Background({ colors }: { colors: AuraColor[] }) {
           }}
           performance={{ min: 0.5 }}
         >
-          <ambientLight intensity={1} />
-
-          {blobConfigs.map((config, index) => (
-            <Blob
-              key={`blob-${index}`}
-              colors={colors}
-              colorIndex={index}
-              isMobile={isMobile}
-              {...config}
-            />
-          ))}
-
-          <EffectComposer>
-            <Bloom
-              mipmapBlur={true}
-              luminanceThreshold={0.1}
-              intensity={1.48}
-              opacity={6.12}
-            />
-          </EffectComposer>
-
-          <Preload all />
-
-          <Environment resolution={256}>
-            <group rotation={[-Math.PI / 3, 0, 1]}>
-              <Lightformer
-                form="circle"
-                intensity={100}
-                rotation-x={Math.PI / 2}
-                position={[0, 5, -9]}
-                scale={2}
-              />
-              <Lightformer
-                form="circle"
-                intensity={2}
-                rotation-y={Math.PI / 2}
-                position={[-5, 1, -1]}
-                scale={2}
-              />
-              <Lightformer
-                form="circle"
-                intensity={2}
-                rotation-y={-Math.PI / 2}
-                position={[10, 1, 0]}
-                scale={8}
-              />
-              <Lightformer
-                form="ring"
-                color="#fff"
-                intensity={80}
-                position={[10, 10, 0]}
-                scale={10}
-              />
-            </group>
-          </Environment>
+          <Scene colors={colors} isMobile={isMobile} />
         </Canvas>
       </motion.div>
 
@@ -191,7 +235,8 @@ export function Background({ colors }: { colors: AuraColor[] }) {
         className={cn(
           "fixed inset-0 -z-10",
           "pointer-events-none",
-          "backdrop-blur-3xl backdrop-brightness-125 backdrop-saturate-200",
+          "backdrop-blur-2xl backdrop-brightness-125 backdrop-saturate-200",
+          "sm:backdrop-blur-3xl",
         )}
       />
     </Suspense>

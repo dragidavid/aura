@@ -33,7 +33,7 @@ export function Colors({ colors }: { colors: AuraColor[] }) {
                   key={`${item.position}-${item.hex}`}
                   className={cn(
                     "absolute inset-0 rounded-full",
-                    "border border-white/20 shadow-lg brightness-125 saturate-150",
+                    "border border-white/10 shadow-lg brightness-125 saturate-150",
                   )}
                   style={{ backgroundColor: item.hex }}
                   initial={{ opacity: 0, scale: 0.75 }}

@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Image from "next/image";
 import { useAura } from "@drgd/aura/client";
 import { motion, AnimatePresence } from "motion/react";
+
 import { cn } from "@/lib/cn";
 
 import type { AuraColor } from "@drgd/aura";
@@ -21,42 +22,44 @@ export function Demo() {
 
   const getNewImage = () => {
     const randomSeed = Math.floor(Math.random() * 1000);
+
     setImageUrl(`https://picsum.photos/seed/${randomSeed}/400`);
   };
 
   return (
     <div
       className={cn(
-        "flex flex-col rounded-lg font-mono text-sm",
-        "border border-white/20",
+        "flex flex-col overflow-hidden rounded-xl font-mono text-sm",
+        "border border-white/10",
       )}
     >
       <div
         className={cn(
-          "flex justify-between gap-3 p-3",
-          "border-b border-white/20 bg-white/5",
+          "flex justify-between gap-2 p-2",
+          "border-b border-white/10",
         )}
       >
         <button
           onClick={getNewImage}
           className={cn(
             "rounded-full px-4 py-2",
-            "border border-dashed border-white/20 bg-white/10",
-            "hover:border-white",
+            "transition-colors duration-100",
+            "border border-white/10",
+            "hover:cursor-pointer hover:bg-white/10",
           )}
         >
-          Refresh
+          New image
         </button>
 
-        <div className={cn("flex gap-3")}>
+        <div className={cn("flex gap-2")}>
           {COLOR_OPTIONS.map((num) => (
             <button
               key={num}
               onClick={() => setPaletteSize(num)}
               className={cn(
                 "size-[38px] rounded-full",
-                "border border-dashed border-white/20 bg-white/10",
-                "hover:border-white",
+                "border border-white/10",
+                "hover:cursor-pointer hover:bg-white/10",
                 paletteSize === num && "border-white",
               )}
             >
@@ -66,7 +69,7 @@ export function Demo() {
         </div>
       </div>
 
-      <div className={cn("flex flex-col gap-3 p-3", "sm:flex-row")}>
+      <div className={cn("flex flex-col gap-2 p-2", "sm:flex-row")}>
         <div className={cn("relative min-h-32 flex-1", "sm:aspect-square")}>
           <AnimatePresence mode="wait">
             {imageUrl && (
@@ -75,7 +78,7 @@ export function Demo() {
                 initial={{ opacity: 0, scale: 0.95, filter: "blur(12px)" }}
                 animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                 exit={{ opacity: 0, scale: 0.95, filter: "blur(12px)" }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.2 }}
                 className={cn("absolute inset-0")}
               >
                 {error ? (
@@ -93,7 +96,6 @@ export function Demo() {
                     alt="Sample"
                     fill
                     className={cn("rounded-lg object-cover")}
-                    sizes="(max-width: 768px) 100vw, 400px"
                     priority
                   />
                 )}
@@ -139,9 +141,9 @@ function Colors({
 
   return (
     <div className="relative">
-      <div className={cn("grid grid-cols-2 gap-3")}>
+      <div className={cn("grid grid-cols-2 gap-2")}>
         {Array.from({ length: colors.length }).map((_, index) => (
-          <div key={`slot-${index}`} className={cn("relative h-9")}>
+          <div key={`slot-${index}`} className={cn("relative h-8")}>
             <AnimatePresence>
               {items.map((item) => {
                 if (item.position !== index) return null;

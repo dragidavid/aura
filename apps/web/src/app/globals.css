@@ -25,7 +25,7 @@
   }
 
   code {
-    background-color: color-mix(in oklab, var(--color-white) 17%, transparent);
+    background-color: color-mix(in oklab, var(--color-white) 20%, transparent);
     padding: var(--spacing) calc(var(--spacing) * 1.5);
     color: var(--color-white);
     border-radius: var(--radius-md);
