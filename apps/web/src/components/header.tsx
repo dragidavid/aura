@@ -28,6 +28,7 @@ export async function Header() {
 
         <div className={cn("flex items-center gap-2")}>
           <a
+            aria-label="View source code on GitHub"
             href="https://github.com/dragidavid/aura"
             target="_blank"
             className={cn(
@@ -52,6 +53,7 @@ export async function Header() {
           </a>
 
           <a
+            aria-label="View package on npm"
             href="https://www.npmjs.com/package/@drgd/aura"
             target="_blank"
             className={cn(
@@ -73,6 +75,7 @@ export async function Header() {
           </a>
 
           <a
+            aria-label="View profile on X"
             href="https://x.com/dragidavid"
             target="_blank"
             className={cn(

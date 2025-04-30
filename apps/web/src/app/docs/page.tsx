@@ -85,14 +85,14 @@ export default function Page() {
           <div
             className={cn(
               "text-2xs relative flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
-              "bg-emerald-400/40 text-emerald-500",
+              "border border-emerald-500/40 bg-emerald-500/30 text-emerald-500",
             )}
           >
             <span>client</span>
             <div
               className={cn(
                 "absolute left-full h-px w-2xl",
-                "bg-gradient-to-r from-emerald-400/40 to-transparent",
+                "bg-gradient-to-r from-emerald-500/40 to-transparent",
               )}
             />
           </div>
@@ -164,14 +164,14 @@ export default function Page() {
           <div
             className={cn(
               "text-2xs relative flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
-              "bg-rose-400/40 text-rose-500",
+              "border border-rose-500/40 bg-rose-500/20 text-rose-500",
             )}
           >
             <span>server</span>
             <div
               className={cn(
                 "absolute left-full h-px w-2xl",
-                "bg-gradient-to-r from-rose-400/40 to-transparent",
+                "bg-gradient-to-r from-rose-500/40 to-transparent",
               )}
             />
           </div>

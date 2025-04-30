@@ -109,6 +109,7 @@ export function Carousel({
 
       <button
         onClick={scrollPrev}
+        aria-label="Previous image"
         className={cn(
           "absolute top-1/2 left-4 z-10 hidden -translate-y-1/2 rounded-full p-2",
           "border border-white/10 bg-black/20",
@@ -132,6 +133,7 @@ export function Carousel({
 
       <button
         onClick={scrollNext}
+        aria-label="Next image"
         className={cn(
           "absolute top-1/2 right-4 z-10 hidden -translate-y-1/2 rounded-full p-2",
           "border border-white/10 bg-black/20",

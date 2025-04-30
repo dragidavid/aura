@@ -76,8 +76,8 @@ const Blob = ({
             animate={{
               color: blobColor,
             }}
-            roughness={0.65}
-            metalness={0.9}
+            roughness={0.63}
+            metalness={0.92}
           />
         </Icosahedron>
       </mesh>
@@ -235,7 +235,7 @@ export function Background({ colors }: { colors: AuraColor[] }) {
         className={cn(
           "fixed inset-0 -z-10",
           "pointer-events-none",
-          "backdrop-blur-2xl backdrop-brightness-125 backdrop-saturate-200",
+          "backdrop-blur-2xl backdrop-brightness-110 backdrop-saturate-200",
           "sm:backdrop-blur-3xl",
         )}
       />

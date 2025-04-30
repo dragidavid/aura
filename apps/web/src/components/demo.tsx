@@ -41,6 +41,7 @@ export function Demo() {
       >
         <button
           onClick={getNewImage}
+          aria-label="Get new image"
           className={cn(
             "rounded-full px-4 py-2",
             "transition-colors duration-100",
@@ -56,6 +57,7 @@ export function Demo() {
             <button
               key={num}
               onClick={() => setPaletteSize(num)}
+              aria-label={`Set palette size to ${num}`}
               className={cn(
                 "size-[38px] rounded-full",
                 "border border-white/10",

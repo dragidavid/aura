@@ -59,6 +59,8 @@ export function Code({ code, language = "jsx" }: Props) {
   return (
     <div className={cn("group relative")}>
       <button
+        onClick={onCopy}
+        aria-label="Copy code"
         className={cn(
           "absolute top-3 right-3 z-10 grid size-8 place-items-center rounded-md",
           "border border-white/10 bg-black/20 opacity-0",
@@ -66,7 +68,6 @@ export function Code({ code, language = "jsx" }: Props) {
           "hover:cursor-pointer hover:bg-white/10",
           "group-hover:opacity-100",
         )}
-        onClick={onCopy}
       >
         {copying ? (
           <div>
