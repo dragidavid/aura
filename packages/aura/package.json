@@ -40,6 +40,7 @@
     "dev": "tsup --watch",
     "build": "tsup",
     "lint": "tsc",
+    "test": "vitest run",
     "release": "changeset version",
     "pub:release": "pnpm build && pnpm publish --access public"
   },
@@ -63,10 +64,13 @@
     "sharp": "^0.34.1"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.3.0",
     "@types/node": "^22.14.1",
     "@types/react": "^19.1.2",
+    "jsdom": "^26.1.0",
     "tsup": "^8.4.0",
-    "typescript": "latest"
+    "typescript": "latest",
+    "vitest": "^3.1.2"
   },
   "browserslist": [
     "defaults",

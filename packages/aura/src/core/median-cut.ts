@@ -8,8 +8,10 @@ import { Color } from "./color";
  * @returns Array of averaged colors
  */
 export function medianCut(colors: Color[], depth: number): Color[] {
-  if (depth === 0 || colors.length === 0) {
-    return [Color.average(colors)];
+  // Base case: Stop recursion if depth is 0 or the bucket cannot be split further (0 or 1 color).
+  if (depth === 0 || colors.length <= 1) {
+    // Return the average of the single color, or an empty array if the bucket was empty.
+    return colors.length > 0 ? [Color.average(colors)] : [];
   }
 
   // Find the color channel with the largest range

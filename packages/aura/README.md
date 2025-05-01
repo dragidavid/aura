@@ -1,10 +1,10 @@
 <div align="center">
   <picture>
-    <img alt="Aura logo" src="https://github.com/user-attachments/assets/4ffe1daa-77dd-4e78-8109-f79f90688b7f">
+    <img alt="logo" src="https://raw.githubusercontent.com/dragidavid/aura/main/apps/web/public/aura_logo.png" width="150">
   </picture>
   
-  <h1><b>Aura</b></h1>
-  <p>Extract color palettes from any image. Zero config, works everywhere.</p>
+  <h1><b>@drgd/aura</b></h1>
+  <p>Extract color palettes from any image.<br> Zero config, works everywhere.</p>
 </div>
 
 <div align="center">
@@ -14,35 +14,80 @@
 
 </div>
 
-## Install
+## Installation
 
 To get started, install the required dependencies:
 
 ```bash
-npm install @drgd/aura sharp
-# or
-yarn add @drgd/aura sharp
-# or
 pnpm add @drgd/aura sharp
 ```
 
-**Note:** The server-side functionality relies on the `sharp` library. Please refer to the [official `sharp` installation documentation](https://sharp.pixelplumbing.com/install) for platform-specific requirements if you encounter installation issues.
+**Note:** `sharp` is a **peer dependency** required only for **server-side** usage (`getAura`). If you only use the client-side hook (`useAura`), you don't need to install `sharp`. Please refer to the [official `sharp` installation documentation](https://sharp.pixelplumbing.com/install) if you encounter platform-specific installation issues.
 
 ## Usage
 
-Then you can use the `getAura` function (server-side) or `useAura` hook (client-side).
+Import the desired function/hook from the appropriate entry point.
 
-### Server-side
+### Client-side
 
-Use `getAura` inside an `async` Server Component. Wrap the component in `<Suspense>` to avoid blocking the initial page load.
+Use the `useAura` hook within your React components. It handles loading and error states internally.
 
 ```tsx
+// app/components/my-image-colors.tsx
+"use client";
+
+import { useAura } from "@drgd/aura/client";
+
+export function MyImageColors({ imageUrl }: { imageUrl: string }) {
+  const { colors, isLoading, error } = useAura(imageUrl, {
+    paletteSize: 5, // Optional: Specify number of colors (1-12, default: 6)
+    // fallbackColors: [{ hex: '#...', weight: 1 }], // Optional: Custom fallbacks
+    onError: (err) => console.error("Aura failed:", err.message), // Optional: Error callback
+  });
+
+  if (isLoading) return <p>Loading colors...</p>;
+
+  // You can optionally display the error message
+  // if (error) return <p>Error loading colors: {error.message}</p>;
+
+  // On error, 'colors' will contain the fallback palette
+  return (
+    <ul className="flex gap-2 p-0 m-0 list-none">
+      {colors.map((color) => (
+        <li
+          key={color.hex}
+          className="bg-white/10 rounded-full size-10 flex items-center justify-center text-sm text-white/70"
+          style={{
+            backgroundColor: color.hex,
+          }}
+          title={`${color.hex} (${Math.round(color.weight * 100)}%)`}
+        >
+          {/* Display hex or weight */}
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Server-side (Function)
+
+Use the `getAura` function within `async` Server Components or server environments. Wrap Server Components using it in `<Suspense>` to avoid blocking.
+
+```tsx
+// app/page.tsx
 import { getAura } from "@drgd/aura/server";
 import { Suspense } from "react";
 
-// Server Component that gets the colors
-async function Colors({ imageUrl }) {
-  const colors = await getAura(imageUrl);
+async function ColorsDisplay({ imageUrl }: { imageUrl: string }) {
+  // Fetches colors server-side. Returns fallbacks on error.
+  const colors = await getAura(imageUrl, {
+    paletteSize: 8, // Optional: Specify number of colors (1-12, default: 6)
+    // quality: 'high', // Optional: 'low' (200px), 'medium' (400px), 'high' (800px)
+    // timeout: 5000, // Optional: Max processing time in ms (default: 10000)
+    // validateUrl: false, // Optional: Disable internal URL checks (default: true)
+    // fallbackColors: [{ hex: '#...', weight: 1 }], // Optional: Custom fallbacks
+  });
 
   return (
     <ul>
@@ -55,48 +100,65 @@ async function Colors({ imageUrl }) {
   );
 }
 
-// Parent Server Component
 export default async function Page() {
-  const imageUrl = "https://example.com/image.jpg";
+  const imageUrl =
+    "https://images.unsplash.com/photo-1715941321781-face91416653"; // Example
 
   return (
     <div>
       <h1>Image Colors</h1>
       <Suspense fallback={<p>Loading colors...</p>}>
-        <Colors imageUrl={imageUrl} />
+        <ColorsDisplay imageUrl={imageUrl} />
       </Suspense>
     </div>
   );
 }
 ```
 
-### Client-side
+## API Reference
 
-```tsx
-import { useAura } from "@drgd/aura/client";
+### `useAura(imageUrl, options?)` (Client)
 
-export function Colors() {
-  const { colors, isLoading, error } = useAura("https://example.com/image.jpg");
+React hook for client-side color extraction.
 
-  if (isLoading) return <p>Loading...</p>;
+- `imageUrl: string`: The URL of the image to process.
+- `options?: object`:
+  - `paletteSize?: number`: Number of colors to extract (Range: 1-12, Default: 6).
+  - `fallbackColors?: AuraColor[]`: Custom array of fallback colors (`{ hex: string; weight: number }[]`) to use if extraction fails. Defaults to a predefined grayscale palette.
+  - `onError?: (error: Error) => void`: Callback function triggered when an error occurs during extraction.
+- **Returns:** `AuraResponse` object:
+  - `colors: AuraColor[]`: Array of extracted (or fallback) colors, sorted by weight.
+  - `isLoading: boolean`: True while the image is being processed.
+  - `error: Error | null`: An Error object if extraction failed, otherwise null.
 
-  if (error) return <p>Error: {error?.message}</p>;
+### `getAura(imageUrl, options?)` (Server)
 
-  return (
-    <ul>
-      {colors.map((color) => (
-        <li key={color.hex}>
-          {color.hex} - {color.weight}
-        </li>
-      ))}
-    </ul>
-  );
-}
+Async function for server-side color extraction.
+
+- `imageUrl: string`: The URL of the image to process.
+- `options?: object`:
+  - `paletteSize?: number`: Number of colors to extract (Range: 1-12, Default: 6).
+  - `timeout?: number`: Maximum processing time in milliseconds (Default: 10000).
+  - `quality?: "low" | "medium" | "high"`: Image processing quality/resolution hint (Default: 'medium' equivalent, internally uses 400px max dimension). 'low' (200px), 'high' (800px).
+  - `validateUrl?: boolean`: Whether to perform internal URL validation checks (protocol, type, size). Recommended to leave enabled unless URLs are pre-validated (Default: true).
+  - `fallbackColors?: AuraColor[]`: Custom array of fallback colors (`{ hex: string; weight: number }[]`) to use if extraction fails. Defaults to a predefined grayscale palette.
+- **Returns:** `Promise<AuraColor[]>`: A promise resolving to the array of extracted (or fallback) colors, sorted by weight. Throws an error only for invalid `paletteSize`. Other errors (network, processing) result in fallback colors being returned.
+
+### `AuraColor` Type
+
+```typescript
+type AuraColor = {
+  hex: string; // Hexadecimal color code (e.g., "#FF0000")
+  weight: number; // Color prevalence/importance (0-1)
+};
 ```
 
-## Documentation
+## Error Handling
 
-Find the full documentation [here](https://aura.dragi.me/docs).
+Both `getAura` and `useAura` are designed to be resilient.
+
+- **`getAura` (Server):** Catches most errors internally (network, timeout, invalid image data) and returns the fallback palette. It only throws if the `paletteSize` option is invalid.
+- **`useAura` (Client):** Manages internal loading and error states. If an error occurs (network, timeout, invalid image), it sets the `error` state value, calls the `onError` callback (if provided), and returns the fallback palette in the `colors` state value. Your React component will not crash.
 
 ## Authors
 

@@ -1,7 +1,7 @@
 import { Color } from "./color";
 
-// Memoized distance calculation to avoid recalculating distances
-const memoizedDistance = (color: Color, centroid: Color): number => {
+// Helper function to calculate squared Euclidean distance between two colors.
+const calculateDistanceSquared = (color: Color, centroid: Color): number => {
   return (
     Math.pow(color.r - centroid.r, 2) +
     Math.pow(color.g - centroid.g, 2) +
@@ -43,7 +43,8 @@ export function kMeansClustering(
       );
     });
 
-    // Choose next centroid with probability proportional to distance squared
+    // Choose next centroid probabilistically (proportional to distance squared)
+    // This is the core idea of k-means++ initialization.
     const sum = distances.reduce((a, b) => a + b, 0);
     const random = Math.random() * sum;
 
@@ -51,6 +52,7 @@ export function kMeansClustering(
 
     for (let i = 0; i < distances.length; i++) {
       acc += distances[i] ?? 0;
+
       if (acc >= random) {
         centroids.push(colors[i]!);
         break;
@@ -78,7 +80,7 @@ export function kMeansClustering(
         nearestIndex = 0;
 
         currentCentroids.forEach((centroid, i) => {
-          const distance = memoizedDistance(color, centroid);
+          const distance = calculateDistanceSquared(color, centroid);
 
           if (distance < minDistance) {
             minDistance = distance;
