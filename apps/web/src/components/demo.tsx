@@ -86,11 +86,11 @@ export function Demo() {
                 {error ? (
                   <div
                     className={cn(
-                      "flex size-full items-center justify-center rounded-lg",
+                      "flex size-full items-center justify-center rounded-lg text-2xl",
                       "bg-white/5",
                     )}
                   >
-                    ?
+                    <span>×</span>
                   </div>
                 ) : (
                   <Image
@@ -113,7 +113,7 @@ export function Demo() {
                 "text-red-500",
               )}
             >
-              <span>Error</span>
+              <span>Error getting colors</span>
             </div>
           ) : (
             <Colors colors={colors} isLoading={isLoading} />

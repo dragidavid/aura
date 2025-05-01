@@ -33,7 +33,14 @@ import { Suspense } from "react";
 
 // Server Component that gets the colors
 async function Colors({ imageUrl }) {
-  const colors = await getAura(imageUrl);
+  // Fetches colors server-side. Returns fallbacks on error.
+  const colors = await getAura(imageUrl, {
+    paletteSize: 8, // Optional: Specify number of colors (1-12, default: 6)
+    // quality: 'high', // Optional: 'low' (200px), 'medium' (400px), 'high' (800px)
+    // timeout: 5000, // Optional: Max processing time in ms (default: 10000)
+    // validateUrl: false, // Optional: Disable internal URL checks (default: true)
+    // fallbackColors: [{ hex: '#...', weight: 1 }], // Optional: Custom fallbacks
+  });
 
   return (
     <ul>
@@ -74,7 +81,9 @@ export default function Page() {
           <h3 className={cn("my-3 font-sans text-lg font-bold")}>
             Installation
           </h3>
+
           <Code code="pnpm add @drgd/aura sharp" language="bash" />
+
           <p className={cn("mt-3 text-sm", "text-white/60")}>
             Note: Server-side usage requires the peer dependency{" "}
             <code>sharp</code> to be installed as shown above.
@@ -181,8 +190,8 @@ export default function Page() {
           <p className={cn("mb-5", "text-white/60")}>
             Use the <code>getAura</code> function inside an async Server
             Component. To prevent blocking the initial page load while colors
-            are extracted, wrap the component calling{" "}
-            <code>await getAura(...)</code> in <code>&lt;Suspense&gt;</code>.
+            are extracted, wrap the component calling the function in{" "}
+            <code>&lt;Suspense&gt;</code>.
           </p>
 
           <Code code={USAGE_SERVER} />
@@ -296,10 +305,14 @@ const fallbackColors = [
 ];
 
 // Server-side usage
-const colors = await getAura(imageUrl, 3, { fallbackColors });
+const colors = await getAura(imageUrl, { 
+  paletteSize: 3,
+  fallbackColors 
+});
 
 // Client-side usage
-const { colors } = useAura(imageUrl, 3, { 
+const { colors } = useAura(imageUrl, {
+  paletteSize: 3, 
   fallbackColors,
   onError: (error) => console.error(error)
 });`}
