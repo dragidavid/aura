@@ -9,7 +9,7 @@
     "aura:build": "turbo build --filter=@drgd/aura build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "test": "echo \"No tests specified\" && exit 0",
+    "test": "turbo test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky",
     "release": "changeset version",
