@@ -91,7 +91,7 @@ export default async function Page() {
         </div>
       </div>
 
-      <div className={cn("flex-3 pb-2")}>
+      <div className={cn("flex-1 pb-2", "sm:flex-3")}>
         <div
           className={cn(
             "relative mx-auto h-full max-h-(--container-lg) max-w-md overflow-hidden rounded-xl p-2",

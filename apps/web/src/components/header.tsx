@@ -17,7 +17,7 @@ export async function Header() {
           "border border-white/10 bg-black/20 backdrop-blur-md",
         )}
       >
-        <Link href="/" className="select-none">
+        <Link href="/" className={cn("rounded-full", "select-none")}>
           <Image
             src={logo}
             alt="Aura Logo"

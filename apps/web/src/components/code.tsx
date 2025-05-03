@@ -10,6 +10,7 @@ const theme = {
   plain: {
     color: "var(--color-white)",
     fontSize: "13px",
+    lineHeight: "1.7",
   },
   styles: [
     {

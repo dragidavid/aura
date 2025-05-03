@@ -73,9 +73,36 @@ export const metadata: Metadata = {
     "Extract color palettes from any image. Zero config, works everywhere.",
 };
 
+type SectionBadgeProps = {
+  variant: "client" | "server";
+  children: React.ReactNode;
+};
+
+function SectionBadge({ variant, children }: SectionBadgeProps) {
+  const variantStyles = {
+    client: "bg-emerald-400 text-black",
+    server: "bg-rose-400 text-black",
+  };
+
+  return (
+    <div
+      className={cn(
+        "text-2xs absolute -top-2.5 flex items-center justify-center rounded-sm px-1.5 py-0.5 font-mono font-bold uppercase",
+        variantStyles[variant],
+      )}
+    >
+      <span>{children}</span>
+    </div>
+  );
+}
+
 export default function Page() {
   return (
-    <div className={cn("fixed inset-0 overflow-y-auto px-4 pt-18 pb-4")}>
+    <div
+      className={cn(
+        "fixed inset-0 overflow-x-clip overflow-y-auto px-4 pt-18 pb-4",
+      )}
+    >
       <div className={cn("mx-auto flex w-full max-w-2xl flex-col gap-12")}>
         <div>
           <h3 className={cn("my-3 font-sans text-lg font-bold")}>
@@ -90,25 +117,16 @@ export default function Page() {
           </p>
         </div>
 
-        <div>
-          <div
-            className={cn(
-              "text-2xs relative flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
-              "border border-emerald-500/40 bg-emerald-500/30 text-emerald-500",
-            )}
-          >
-            <span>client</span>
-            <div
-              className={cn(
-                "absolute left-full h-px w-2xl",
-                "bg-gradient-to-r from-emerald-500/40 to-transparent",
-              )}
-            />
-          </div>
+        <div
+          className={cn(
+            "relative -mx-8 rounded-xl px-8 pt-2 pb-6",
+            "border border-dashed border-emerald-500/40 bg-emerald-500/5",
+            "sm:pb-8",
+          )}
+        >
+          <SectionBadge variant="client">client</SectionBadge>
 
-          <h3 className={cn("my-3 font-sans text-lg font-bold")}>
-            Basic Usage
-          </h3>
+          <h3 className={cn("my-3 font-sans text-lg font-bold")}>Usage</h3>
 
           <p className={cn("mb-5", "text-white/60")}>
             Use the <code>useAura</code> hook to extract colors in React
@@ -169,21 +187,14 @@ export default function Page() {
           <Demo />
         </div>
 
-        <div>
-          <div
-            className={cn(
-              "text-2xs relative flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
-              "border border-rose-500/40 bg-rose-500/20 text-rose-500",
-            )}
-          >
-            <span>server</span>
-            <div
-              className={cn(
-                "absolute left-full h-px w-2xl",
-                "bg-gradient-to-r from-rose-500/40 to-transparent",
-              )}
-            />
-          </div>
+        <div
+          className={cn(
+            "relative -mx-8 rounded-xl px-8 pt-2 pb-6",
+            "border border-dashed border-rose-400/30 bg-rose-500/5",
+            "sm:pb-8",
+          )}
+        >
+          <SectionBadge variant="server">server</SectionBadge>
 
           <h3 className={cn("my-3 font-sans text-lg font-bold")}>Usage</h3>
 
@@ -263,23 +274,8 @@ export default function Page() {
         </div>
 
         <div>
-          <div
-            className={cn(
-              "text-2xs relative flex h-5 max-w-min items-center rounded-md px-1.5 font-bold uppercase",
-              "bg-white/70 text-black/70",
-            )}
-          >
-            <span>general</span>
-            <div
-              className={cn(
-                "absolute left-full h-px w-2xl",
-                "bg-gradient-to-r from-white/70 to-transparent",
-              )}
-            />
-          </div>
-
           <h3 className={cn("my-3 font-sans text-lg font-bold")}>
-            Error handling & using fallbacks
+            Error handling & Fallbacks
           </h3>
 
           <p className={cn("mb-5", "text-white/60")}>
