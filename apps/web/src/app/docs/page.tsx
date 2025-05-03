@@ -103,6 +103,14 @@ export default function Page() {
         "fixed inset-0 overflow-x-clip overflow-y-auto px-4 pt-18 pb-4",
       )}
     >
+      <div
+        className={cn(
+          "fixed inset-x-0 top-0 z-50 h-18",
+          "pointer-events-none",
+          "bg-black to-0% mask-b-from-1",
+        )}
+      />
+
       <div className={cn("mx-auto flex w-full max-w-2xl flex-col gap-12")}>
         <div>
           <h3 className={cn("my-3 font-sans text-lg font-bold")}>
@@ -218,7 +226,7 @@ export default function Page() {
               target="_blank"
               className={cn("underline underline-offset-2", "text-white")}
             >
-              Sharp ↗
+              sharp ↗
             </a>
             .
           </p>
@@ -237,8 +245,8 @@ export default function Page() {
                     (default: 6, range: 1-12)
                   </li>
                   <li>
-                    <code>quality</code>: "low" (200px) | "medium" (400px) |
-                    "high" (800px)
+                    <code>quality</code>: &quot;low&quot; (200px) |
+                    &quot;medium&quot; (400px) | &quot;high&quot; (800px)
                   </li>
                   <li>
                     <code>timeout</code>: Maximum processing time in ms
@@ -262,7 +270,8 @@ export default function Page() {
                 each has:
                 <ul className={cn("mt-3 list-disc space-y-3 pl-6")}>
                   <li>
-                    <code>hex</code>: Hexadecimal color code (e.g., "#FF0000")
+                    <code>hex</code>: Hexadecimal color code (e.g.,
+                    &quot;#FF0000&quot;)
                   </li>
                   <li>
                     <code>weight</code>: Color prevalence (0-1)

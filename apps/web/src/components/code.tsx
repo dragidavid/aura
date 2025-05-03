@@ -97,7 +97,7 @@ export function Code({ code, language = "jsx" }: Props) {
         )}
       </button>
       <Highlight theme={theme} code={code} language={language}>
-        {({ className, style, tokens, getLineProps, getTokenProps }) => (
+        {({ style, tokens, getLineProps, getTokenProps }) => (
           <pre
             style={style}
             className={cn(
