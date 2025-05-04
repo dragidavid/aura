@@ -20,7 +20,7 @@ export function medianCut(colors: Color[], depth: number): Color[] {
       min: Math.min(range.min, color.r),
       max: Math.max(range.max, color.r),
     }),
-    { min: 255, max: 0 }
+    { min: 255, max: 0 },
   );
 
   const gRange = colors.reduce(
@@ -28,7 +28,7 @@ export function medianCut(colors: Color[], depth: number): Color[] {
       min: Math.min(range.min, color.g),
       max: Math.max(range.max, color.g),
     }),
-    { min: 255, max: 0 }
+    { min: 255, max: 0 },
   );
 
   const bRange = colors.reduce(
@@ -36,7 +36,7 @@ export function medianCut(colors: Color[], depth: number): Color[] {
       min: Math.min(range.min, color.b),
       max: Math.max(range.max, color.b),
     }),
-    { min: 255, max: 0 }
+    { min: 255, max: 0 },
   );
 
   const rDiff = rRange.max - rRange.min;

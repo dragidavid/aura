@@ -37,7 +37,7 @@ export async function extractColors(
   options: {
     paletteSize?: number;
     validateUrl?: boolean;
-  } = {}
+  } = {},
 ): Promise<AuraColor[]> {
   if (!imageUrl) throw new Error("Image URL is required");
 
@@ -64,7 +64,7 @@ export async function extractColors(
   const { width, height } = getScaledDimensions(
     img.width,
     img.height,
-    MAX_IMAGE_SIZE
+    MAX_IMAGE_SIZE,
   );
 
   const canvas = document.createElement("canvas");
@@ -108,7 +108,7 @@ export async function extractColors(
 
   if (width * height > WARN_SIZE) {
     console.warn(
-      `Processing large image (${width}x${height}px). Consider using a smaller image for better performance.`
+      `Processing large image (${width}x${height}px). Consider using a smaller image for better performance.`,
     );
   }
 

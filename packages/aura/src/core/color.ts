@@ -11,7 +11,7 @@ export class Color {
     public r: number,
     public g: number,
     public b: number,
-    public count: number = 1
+    public count: number = 1,
   ) {}
 
   static average(colors: Color[]): Color {
@@ -47,7 +47,7 @@ export class Color {
         return new Color(
           Math.round(simpleAvgR),
           Math.round(simpleAvgG),
-          Math.round(simpleAvgB)
+          Math.round(simpleAvgB),
         );
       }
 

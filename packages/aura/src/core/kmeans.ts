@@ -20,7 +20,7 @@ const calculateDistanceSquared = (color: Color, centroid: Color): number => {
 export function kMeansClustering(
   colors: Color[],
   k: number,
-  maxIterations = 20
+  maxIterations = 20,
 ): Color[] {
   if (colors.length === 0) return [];
   if (colors.length <= k) return colors;
@@ -38,8 +38,8 @@ export function kMeansClustering(
           (centroid) =>
             Math.pow(color.r - centroid.r, 2) +
             Math.pow(color.g - centroid.g, 2) +
-            Math.pow(color.b - centroid.b, 2)
-        )
+            Math.pow(color.b - centroid.b, 2),
+        ),
       );
     });
 
@@ -123,7 +123,7 @@ export function kMeansClustering(
 
     // Otherwise, update centroids for the next iteration
     currentCentroids = newCentroids.filter(
-      (centroid) => centroid !== undefined
+      (centroid) => centroid !== undefined,
     );
   }
 

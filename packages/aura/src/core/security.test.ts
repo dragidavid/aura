@@ -8,7 +8,7 @@ function createMockResponse(
   status: number,
   ok: boolean,
   headersInit: Record<string, string> = {},
-  body?: BodyInit | null
+  body?: BodyInit | null,
 ): Partial<Response> {
   const headers = new Headers(headersInit);
 
@@ -34,11 +34,11 @@ describe("validateImageUrl", () => {
       createMockResponse(200, true, {
         "content-type": "image/jpeg",
         "content-length": "1024",
-      })
+      }),
     );
 
     await expect(
-      validateImageUrl("https://example.com/image.jpg")
+      validateImageUrl("https://example.com/image.jpg"),
     ).resolves.toBe(true);
     expect(mockFetch).toHaveBeenCalledWith("https://example.com/image.jpg", {
       method: "HEAD",
@@ -59,20 +59,20 @@ describe("validateImageUrl", () => {
 
   it("should reject for an invalid URL format", async () => {
     await expect(validateImageUrl("invalid-url")).rejects.toThrow(
-      "Image validation failed: Invalid image URL format"
+      "Image validation failed: Invalid image URL format",
     );
   });
 
   it("should reject for non-HTTPS/data URLs", async () => {
     await expect(
-      validateImageUrl("http://example.com/image.jpg")
+      validateImageUrl("http://example.com/image.jpg"),
     ).rejects.toThrow(
-      "Image validation failed: Only HTTPS and data URLs are supported"
+      "Image validation failed: Only HTTPS and data URLs are supported",
     );
     await expect(
-      validateImageUrl("ftp://example.com/image.jpg")
+      validateImageUrl("ftp://example.com/image.jpg"),
     ).rejects.toThrow(
-      "Image validation failed: Only HTTPS and data URLs are supported"
+      "Image validation failed: Only HTTPS and data URLs are supported",
     );
   });
 
@@ -80,7 +80,7 @@ describe("validateImageUrl", () => {
     const dataUrl = "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ==";
 
     await expect(validateImageUrl(dataUrl)).rejects.toThrow(
-      /Image validation failed: Invalid image type. Supported types:/i
+      /Image validation failed: Invalid image type. Supported types:/i,
     );
   });
 
@@ -89,11 +89,11 @@ describe("validateImageUrl", () => {
     mockFetch.mockRejectedValueOnce(new Error("HEAD request failed"));
     // Mock successful GET response
     mockFetch.mockResolvedValueOnce(
-      createMockResponse(200, true, { "content-type": "image/webp" })
+      createMockResponse(200, true, { "content-type": "image/webp" }),
     );
 
     await expect(
-      validateImageUrl("https://example.com/image.webp")
+      validateImageUrl("https://example.com/image.webp"),
     ).resolves.toBe(true);
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockFetch).toHaveBeenNthCalledWith(
@@ -104,7 +104,7 @@ describe("validateImageUrl", () => {
         headers: { Accept: "image/*" },
         mode: "cors",
         credentials: "omit",
-      }
+      },
     );
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
@@ -114,7 +114,7 @@ describe("validateImageUrl", () => {
         headers: { Accept: "image/*", Range: "bytes=0-1024" },
         mode: "cors",
         credentials: "omit",
-      }
+      },
     );
   });
 
@@ -123,7 +123,7 @@ describe("validateImageUrl", () => {
     mockFetch.mockResolvedValueOnce(createMockResponse(404, false)); // GET fails
 
     await expect(
-      validateImageUrl("https://example.com/not-found.jpg")
+      validateImageUrl("https://example.com/not-found.jpg"),
     ).rejects.toThrow(/Image is not accessible \(HTTP 404\)/i);
     expect(mockFetch).toHaveBeenCalledTimes(2);
   });
@@ -131,11 +131,11 @@ describe("validateImageUrl", () => {
   it("should reject if GET fallback content-type is invalid", async () => {
     mockFetch.mockRejectedValueOnce(new Error("HEAD request failed"));
     mockFetch.mockResolvedValueOnce(
-      createMockResponse(200, true, { "content-type": "application/json" })
+      createMockResponse(200, true, { "content-type": "application/json" }),
     );
 
     await expect(
-      validateImageUrl("https://example.com/json-file")
+      validateImageUrl("https://example.com/json-file"),
     ).rejects.toThrow(/Unsupported image type/i);
     expect(mockFetch).toHaveBeenCalledTimes(2);
   });
@@ -145,9 +145,9 @@ describe("validateImageUrl", () => {
     mockFetch.mockRejectedValueOnce(new Error("GET fetch failed"));
 
     await expect(
-      validateImageUrl("https://example.com/network-error")
+      validateImageUrl("https://example.com/network-error"),
     ).rejects.toThrow(
-      /Image validation failed: GET fetch failed/ // Error from the second fetch
+      /Image validation failed: GET fetch failed/, // Error from the second fetch
     );
     expect(mockFetch).toHaveBeenCalledTimes(2);
   });

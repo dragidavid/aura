@@ -39,7 +39,7 @@ export async function extractColors(
     quality?: "low" | "medium" | "high";
     validateUrl?: boolean;
     fallbackColors?: AuraColor[];
-  } = {}
+  } = {},
 ): Promise<AuraColor[]> {
   if (!imageUrl) throw new Error("Image URL is required");
 
@@ -68,7 +68,7 @@ export async function extractColors(
     const controller = new AbortController();
     const timeoutId = setTimeout(
       () => controller.abort(),
-      options.timeout ?? 10000
+      options.timeout ?? 10000,
     );
 
     const response = await fetch(imageUrl, { signal: controller.signal });
@@ -144,7 +144,7 @@ export async function extractColors(
 
     console.error(
       "Failed to extract colors:",
-      error instanceof Error ? error.message : "Unknown error"
+      error instanceof Error ? error.message : "Unknown error",
     );
 
     return fallback.slice(0, paletteSize).map((color) => ({

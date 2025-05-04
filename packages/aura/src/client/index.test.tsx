@@ -64,7 +64,7 @@ describe("useAura Hook", () => {
     mockExtractColors.mockRejectedValueOnce(testError);
 
     const { result } = renderHook(() =>
-      useAura(testImageUrl, { fallbackColors: customFallbacks })
+      useAura(testImageUrl, { fallbackColors: customFallbacks }),
     );
 
     await waitFor(() => {
@@ -94,7 +94,7 @@ describe("useAura Hook", () => {
       ({ url }: { url: string }) => useAura(url),
       {
         initialProps: { url: testImageUrl },
-      }
+      },
     );
 
     await waitFor(() => expect(mockExtractColors).toHaveBeenCalledTimes(1));
@@ -121,7 +121,7 @@ describe("useAura Hook", () => {
         useAura(testImageUrl, { paletteSize: size }),
       {
         initialProps: { size: 6 },
-      }
+      },
     );
 
     await waitFor(() => expect(mockExtractColors).toHaveBeenCalledTimes(1));
