@@ -16,7 +16,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Grab some colors - aura",
+    default: "aura - Grab colors from images",
     template: "%s - aura",
   },
   description:

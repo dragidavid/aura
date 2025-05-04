@@ -8,8 +8,6 @@ import { TunnelOut } from "@/components/tunnel-out";
 
 import { cn } from "@/lib/cn";
 
-import type { Metadata } from "next";
-
 export const dynamic = "force-dynamic";
 
 async function getImages() {
