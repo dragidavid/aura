@@ -1,4 +1,4 @@
-name: Release
+name: release
 
 on:
   push:
@@ -10,35 +10,35 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   release:
     if: ${{ github.repository_owner == 'dragidavid' }}
-    name: Release
+    name: release
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
-        name: Install pnpm
+        name: install pnpm
         id: pnpm-install
         with:
           version: 10.9.0
           run_install: false
 
-      - name: Install Node.js
+      - name: install node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
 
-      - name: Install Dependencies
+      - name: install dependencies
         run: pnpm install
 
-      - name: Build the package
+      - name: build the package
         run: pnpm aura:build
 
-      - name: Create Release PR or Publish to NPM
+      - name: create release pr or publish to npm
         id: changesets
         uses: changesets/action@v1
         with:

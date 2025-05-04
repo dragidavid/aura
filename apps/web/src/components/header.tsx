@@ -20,7 +20,7 @@ export async function Header() {
         <Link href="/" className={cn("rounded-full", "select-none")}>
           <Image
             src={logo}
-            alt="Aura Logo"
+            alt="aura logo"
             className={cn("h-5 w-auto", "pointer-events-none")}
             priority
           />

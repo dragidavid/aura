@@ -1,7 +1,7 @@
 {
   "name": "@drgd/aura",
   "version": "0.1.0",
-  "description": "Extract color palettes from any image. Zero config, works everywhere.",
+  "description": "Extract color palettes from any image. Works on both server and client.",
   "license": "MIT",
   "type": "module",
   "publishConfig": {
@@ -30,7 +30,7 @@
     "extract",
     "image",
     "react",
-    "next",
+    "next.js",
     "extract-colors",
     "color-palette",
     "color-extraction",

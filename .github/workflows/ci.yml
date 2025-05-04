@@ -1,4 +1,4 @@
-name: CI
+name: ci
 
 on:
   push:
@@ -8,50 +8,50 @@ on:
 
 jobs:
   build:
-    name: Build & Test
+    name: build & test
     timeout-minutes: 10
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
       - uses: pnpm/action-setup@v4
-        name: Install pnpm
+        name: install pnpm
         id: pnpm-install
         with:
           version: 10.9.0
           run_install: false
 
-      - name: Install Node.js
+      - name: install node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
 
-      - name: Get pnpm store directory
+      - name: get pnpm store directory
         id: pnpm-cache
         run: |
           echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v4
-        name: Setup pnpm cache
+        name: setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Install dependencies
+      - name: install dependencies
         run: pnpm install
 
-      - name: Lint & format
+      - name: lint & format
         run: pnpm lint && pnpm format
 
-      - name: Build
+      - name: build
         run: pnpm build
 
-      - name: Test
+      - name: test
         run: pnpm test

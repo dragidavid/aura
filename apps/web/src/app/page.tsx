@@ -12,12 +12,6 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Aura",
-  description:
-    "Extract color palettes from any image. Zero config, works everywhere.",
-};
-
 async function getImages() {
   const uniqueSeeds = new Set(
     Array.from({ length: 5 }, () => Math.floor(Math.random() * 1000)),
@@ -72,7 +66,7 @@ export default async function Page() {
           <p className="text-white/40">
             Extract color palettes from any image.
             <br />
-            Zero config, works everywhere.
+            Works on both server and client.
           </p>
         </div>
 

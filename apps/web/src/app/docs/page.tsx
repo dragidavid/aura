@@ -68,9 +68,7 @@ export default async function Page() {
 }`;
 
 export const metadata: Metadata = {
-  title: "Aura Documentation",
-  description:
-    "Extract color palettes from any image. Zero config, works everywhere.",
+  title: "Documentation",
 };
 
 type SectionBadgeProps = {
