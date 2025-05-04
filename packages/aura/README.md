@@ -1,6 +1,6 @@
 <div align="center">
   <picture>
-    <img alt="logo" src="https://raw.githubusercontent.com/dragidavid/aura/main/apps/web/public/aura_logo_large.png" width="150">
+    <img alt="logo" src="https://raw.githubusercontent.com/dragidavid/aura/refs/heads/main/apps/web/public/aura_logo_large.png?token=GHSAT0AAAAAAC2U6AGATWMIXTA4Q26EVN5Q2AXXPSA" width="150">
   </picture>
   
   <h1><b>@drgd/aura</b></h1>
