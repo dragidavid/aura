@@ -1,10 +1,11 @@
 "use client";
 
 import { Suspense, useRef, useMemo, useCallback } from "react";
-import { Canvas, useFrame, extend } from "@react-three/fiber";
-import { useSpring, animated as a3 } from "@react-spring/three";
-import { useSpring as useWebSpring, animated } from "@react-spring/web";
-import { MathUtils, Mesh, AmbientLight } from "three";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
+import { motion as m3 } from "framer-motion-3d";
+import { motion } from "motion/react";
+import { MathUtils, Mesh } from "three";
 import {
   Icosahedron,
   Environment,
@@ -13,13 +14,19 @@ import {
   Lightformer,
 } from "@react-three/drei";
 
-import { useIsMobile } from "@/hooks/use-is-mobile";
-
 import { cn } from "@/lib/cn";
 
 import type { AuraColor } from "@drgd/aura";
 
-extend({ AmbientLight });
+type BlobProps = {
+  colorIndex: number;
+  speed: number;
+  scale: number;
+  initialPosition: [number, number, number];
+  uniqueOffset: number;
+  colors: AuraColor[];
+  isBlackBlob: boolean;
+};
 
 const Blob = ({
   colorIndex,
@@ -28,46 +35,34 @@ const Blob = ({
   initialPosition,
   uniqueOffset,
   colors,
-  isMobile,
-}: {
-  colorIndex: number;
-  speed: number;
-  scale: number;
-  initialPosition: [number, number, number];
-  uniqueOffset: number;
-  colors: AuraColor[];
-  isMobile: boolean;
-}) => {
+  isBlackBlob,
+}: BlobProps) => {
   const mesh = useRef<Mesh>(null);
-  const currentColor = colors[Math.floor(colorIndex / 2)]?.hex || "#fff";
+  const blobColor = isBlackBlob
+    ? "#000000"
+    : colors[Math.floor(colorIndex / 2)]?.hex || "#ffffff";
 
-  const { color } = useSpring({
-    color: currentColor,
-    config: { mass: 1.5, tension: 180, friction: 12 },
-  });
-
-  const animate = useCallback(
+  const updatePosition = useCallback(
     (time: number) => {
       if (!mesh.current) return;
 
       const x =
-        initialPosition[0] +
-        Math.sin(time * speed + uniqueOffset) * (isMobile ? 0.5 : 0.6);
+        initialPosition[0] + Math.sin(time * speed + uniqueOffset) * 0.6;
       const y =
         initialPosition[1] +
-        Math.cos(time * (speed * 0.8) + uniqueOffset) * (isMobile ? 0.4 : 0.5);
+        Math.cos(time * (speed * 0.8) + uniqueOffset) * 0.5;
       const z =
         initialPosition[2] +
-        Math.sin(time * (speed * 0.5) + uniqueOffset) * 0.2;
+        Math.sin(time * (speed * 0.5) + uniqueOffset) * 0.8;
 
       mesh.current.position.set(x, y, z);
       mesh.current.rotation.x = Math.sin(time * 0.15 + uniqueOffset) * 0.1;
       mesh.current.rotation.y = Math.cos(time * 0.15 + uniqueOffset) * 0.1;
     },
-    [speed, initialPosition, uniqueOffset, isMobile],
+    [speed, initialPosition, uniqueOffset],
   );
 
-  useFrame((state) => animate(state.clock.getElapsedTime()));
+  useFrame((state) => updatePosition(state.clock.getElapsedTime()));
 
   return (
     <Float
@@ -76,52 +71,169 @@ const Blob = ({
       floatIntensity={0.4}
       floatingRange={[-0.2, 0.2]}
     >
-      {/* @ts-expect-error - types are not fully compatible */}
-      <a3.mesh ref={mesh} scale={scale} position={initialPosition}>
-        <Icosahedron args={[1, 20]}>
-          {/* @ts-expect-error - types are not fully compatible */}
-          <a3.meshStandardMaterial
-            color={color}
-            roughness={0.8}
-            metalness={0.2}
+      <mesh ref={mesh} scale={scale} position={initialPosition}>
+        <Icosahedron args={[1, 16]}>
+          <m3.meshStandardMaterial
+            animate={{
+              color: blobColor,
+            }}
+            roughness={0.63}
+            metalness={0.92}
           />
         </Icosahedron>
-        {/* @ts-expect-error - types are not fully compatible */}
-      </a3.mesh>
+      </mesh>
     </Float>
   );
 };
 
-export function Background({ colors }: { colors: AuraColor[] }) {
-  const { isMobile } = useIsMobile();
+// Ratio of colored blobs to black blobs (e.g., 3 means 3 colored for every 1 black).
+const COLORED_TO_BLACK_RATIO = 3;
+// Percentage (0.0 to 1.0) of blobs that should spawn in the middle horizontal third.
+// Lower value = more spread towards left/right edges.
+const MIDDLE_THIRD_PERCENTAGE = 0.58;
+// Factor by which black blobs are scaled down relative to colored blobs in the same zone (e.g., 0.5 means half size).
+const BLACK_BLOB_SIZE_FACTOR = 0.5;
+// Multiplier for the total number of colored blobs (e.g., 1.5 means 50% more blobs than the base count derived from colors.length * 2).
+const BLOB_COUNT_MULTIPLIER = 1.5;
+
+function Scene({ colors }: { colors: AuraColor[] }) {
+  const { viewport } = useThree();
 
   const blobConfigs = useMemo(() => {
-    const totalBlobs = colors.length * 2;
-    return Array(totalBlobs)
-      .fill(null)
-      .map((_, index) => ({
-        speed: MathUtils.randFloat(0.15, 0.25),
-        scale: MathUtils.randFloat(isMobile ? 1.4 : 0.6, isMobile ? 1.8 : 0.8),
-        initialPosition: [
-          MathUtils.randFloat(-0.8, 0.8),
-          MathUtils.randFloat(isMobile ? -2 : -0.6, isMobile ? -1.7 : 0.6),
-          MathUtils.randFloat(-0.3, 0.3),
-        ] as [number, number, number],
-        uniqueOffset: Math.random() * Math.PI * 2,
-        intensity: index % 2 === 0 ? 1 : 0.7,
-      }));
-  }, [colors.length, isMobile]);
+    const numColoredBase = colors.length * 2;
+    const numColoredBlobs = Math.ceil(numColoredBase * BLOB_COUNT_MULTIPLIER);
+    const numBlackBlobs = Math.ceil(numColoredBlobs / COLORED_TO_BLACK_RATIO);
+    const totalBlobs = numColoredBlobs + numBlackBlobs;
 
-  const fadeIn = useWebSpring({
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-    config: { duration: 4000 },
-  });
+    const configs = [];
+
+    for (let i = 0; i < totalBlobs; i++) {
+      const isBlackBlob = i >= numColoredBlobs;
+      const colorIndex = isBlackBlob ? -1 : i % numColoredBase;
+      const isInMiddleThird = Math.random() < MIDDLE_THIRD_PERCENTAGE;
+      let relativeInitialX;
+      let scaleRange: [number, number];
+
+      if (isInMiddleThird) {
+        relativeInitialX = MathUtils.randFloat(-1 / 6, 1 / 6);
+        scaleRange = [0.75, 1.44];
+      } else {
+        relativeInitialX =
+          Math.random() < 0.5
+            ? MathUtils.randFloat(-0.5, -1 / 6)
+            : MathUtils.randFloat(1 / 6, 0.5);
+        scaleRange = [0.4, 0.75];
+      }
+
+      let scaleMultiplier = MathUtils.randFloat(scaleRange[0], scaleRange[1]);
+
+      if (isBlackBlob) {
+        scaleMultiplier *= BLACK_BLOB_SIZE_FACTOR;
+      }
+
+      const relativeInitialY = MathUtils.randFloat(-0.5, 0.5);
+
+      const initialZ = isBlackBlob
+        ? MathUtils.randFloat(0, 2)
+        : MathUtils.randFloat(-2, 0);
+
+      configs.push({
+        key: `blob-${i}`,
+        isBlackBlob: isBlackBlob,
+        colorIndex: colorIndex,
+        speed: MathUtils.randFloat(0.1, 0.3),
+        scaleMultiplier: scaleMultiplier,
+        relativeInitialX: relativeInitialX,
+        relativeInitialY: relativeInitialY,
+        initialZ: initialZ,
+        uniqueOffset: Math.random() * Math.PI * 2,
+      });
+    }
+
+    return configs;
+  }, [colors.length]);
+
+  // Base scale factor for all blobs, relative to the viewport width.
+  // Adjust the multiplier (0.1) to uniformly scale all blobs up or down.
+  const baseScale = viewport.width * 0.09;
 
   return (
+    <>
+      <ambientLight intensity={1} />
+
+      {blobConfigs.map((config) => {
+        const currentScale = baseScale * config.scaleMultiplier;
+        const currentInitialX = config.relativeInitialX * viewport.width;
+        const currentInitialY = config.relativeInitialY * viewport.height;
+        const currentInitialPosition: [number, number, number] = [
+          currentInitialX,
+          currentInitialY,
+          config.initialZ,
+        ];
+
+        return (
+          <Blob
+            key={config.key}
+            colors={colors}
+            colorIndex={config.colorIndex}
+            isBlackBlob={config.isBlackBlob}
+            speed={config.speed}
+            scale={currentScale}
+            initialPosition={currentInitialPosition}
+            uniqueOffset={config.uniqueOffset}
+          />
+        );
+      })}
+
+      <EffectComposer>
+        <Bloom mipmapBlur={true} luminanceThreshold={0.1} intensity={1.58} />
+      </EffectComposer>
+
+      <Preload all />
+
+      <Environment resolution={256}>
+        <group rotation={[-Math.PI / 3, 0, 1]}>
+          <Lightformer
+            form="circle"
+            intensity={100}
+            rotation-x={Math.PI / 2}
+            position={[0, 5, -9]}
+            scale={2}
+          />
+          <Lightformer
+            form="circle"
+            intensity={2}
+            rotation-y={Math.PI / 2}
+            position={[-5, 1, -1]}
+            scale={2}
+          />
+          <Lightformer
+            form="circle"
+            intensity={2}
+            rotation-y={-Math.PI / 2}
+            position={[10, 1, 0]}
+            scale={8}
+          />
+          <Lightformer
+            form="ring"
+            color="#fff"
+            intensity={80}
+            position={[10, 10, 0]}
+            scale={10}
+          />
+        </group>
+      </Environment>
+    </>
+  );
+}
+
+export function Background({ colors }: { colors: AuraColor[] }) {
+  return (
     <Suspense fallback={null}>
-      <animated.div
-        style={fadeIn}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 2, delay: 1 }}
         className={cn("fixed inset-0 -z-10", "pointer-events-none")}
       >
         <Canvas
@@ -133,64 +245,22 @@ export function Background({ colors }: { colors: AuraColor[] }) {
           }}
           dpr={[1, 1.5]}
           camera={{
-            position: [0, 0, isMobile ? 25 : 30],
-            fov: isMobile ? 20 : 17.5,
+            position: [0, 0, 30],
+            fov: 17.5,
             near: 10,
             far: 40,
           }}
           performance={{ min: 0.5 }}
         >
-          <ambientLight intensity={1} />
-          {blobConfigs.map((config, index) => (
-            <Blob
-              key={`blob-${index}`}
-              colors={colors}
-              colorIndex={index}
-              isMobile={isMobile}
-              {...config}
-            />
-          ))}
-          <Preload all />
-          <Environment resolution={256}>
-            <group rotation={[-Math.PI / 3, 0, 1]}>
-              <Lightformer
-                form="circle"
-                intensity={100}
-                rotation-x={Math.PI / 2}
-                position={[0, 5, -9]}
-                scale={2}
-              />
-              <Lightformer
-                form="circle"
-                intensity={2}
-                rotation-y={Math.PI / 2}
-                position={[-5, 1, -1]}
-                scale={2}
-              />
-              <Lightformer
-                form="circle"
-                intensity={2}
-                rotation-y={-Math.PI / 2}
-                position={[10, 1, 0]}
-                scale={8}
-              />
-              <Lightformer
-                form="ring"
-                color="#fff"
-                intensity={80}
-                position={[10, 10, 0]}
-                scale={10}
-              />
-            </group>
-          </Environment>
+          <Scene colors={colors} />
         </Canvas>
-      </animated.div>
+      </motion.div>
 
       <div
         className={cn(
           "fixed inset-0 -z-10",
           "pointer-events-none",
-          "backdrop-blur-3xl backdrop-brightness-150 backdrop-saturate-150",
+          "backdrop-blur-3xl backdrop-brightness-110 backdrop-saturate-200",
         )}
       />
     </Suspense>

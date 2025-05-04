@@ -6,6 +6,7 @@ import {
   medianCut,
   kMeansClustering,
   validateImageUrl,
+  DEFAULT_FALLBACK_COLORS,
 } from "../core";
 
 import type { AuraColor } from "../types";
@@ -14,29 +15,39 @@ const MAX_IMAGE_SIZE = 400; // Maximum dimension for processing
 const BATCH_SIZE = 1000; // Number of pixels to process in each batch
 
 /**
- * Extracts dominant colors from an image using server-side processing with Sharp.
- * Using a combination of median cut and k-means clustering algorithms.
+ * Extracts dominant colors from an image using server-side processing.
  *
- * @param imageUrl - The URL of the image to extract colors from. Must be CORS-enabled or from the same origin.
- * @param numColors - The number of colors to extract from the image. Defaults to 6.
- * @param options - Additional options for processing
- * @returns A promise that resolves to an array of {@link AuraColor} objects, sorted by weight (most dominant first).
- * @throws {Error} If image processing fails
+ * Uses Sharp for image processing and combines median cut with k-means clustering.
+ * Includes automatic image scaling and optimization.
+ *
+ * @param imageUrl - URL of the image
+ * @param options - Configuration options
+ * @param options.paletteSize - Number of colors to extract (1-12)
+ * @param options.timeout - Maximum processing time in ms
+ * @param options.quality - Processing quality (low/medium/high)
+ * @param options.validateUrl - Whether to validate the image URL
+ * @param options.fallbackColors - Custom fallback colors
+ * @returns Promise resolving to array of AuraColor objects, sorted by dominance
+ * @throws {Error} When image processing fails
  */
 export async function extractColors(
   imageUrl: string,
-  numColors: number = 6,
   options: {
+    paletteSize?: number;
     timeout?: number;
     maxSize?: number;
     quality?: "low" | "medium" | "high";
     validateUrl?: boolean;
-  } = {}
+    fallbackColors?: AuraColor[];
+  } = {},
 ): Promise<AuraColor[]> {
-  // Validate input
   if (!imageUrl) throw new Error("Image URL is required");
-  if (numColors < 1 || numColors > 32)
-    throw new Error("Number of colors must be between 1 and 32");
+
+  const paletteSize = options.paletteSize ?? 6;
+
+  if (paletteSize < 1 || paletteSize > 12) {
+    throw new Error("Number of colors must be between 1 and 12");
+  }
 
   // Validate URL if enabled
   if (options.validateUrl !== false) {
@@ -57,10 +68,11 @@ export async function extractColors(
     const controller = new AbortController();
     const timeoutId = setTimeout(
       () => controller.abort(),
-      options.timeout ?? 10000
+      options.timeout ?? 10000,
     );
 
     const response = await fetch(imageUrl, { signal: controller.signal });
+
     clearTimeout(timeoutId);
 
     if (!response.ok) {
@@ -69,9 +81,8 @@ export async function extractColors(
 
     const imageBuffer = await response.arrayBuffer();
     const image = sharp(Buffer.from(imageBuffer));
-
-    // Get image metadata
     const metadata = await image.metadata();
+
     if (!metadata.width || !metadata.height) {
       throw new Error("Invalid image dimensions");
     }
@@ -117,10 +128,10 @@ export async function extractColors(
     const colors = Array.from(colorMap.values());
     const totalPixels = info.width * info.height;
 
-    // Optimize color extraction for small images
-    const initialClusters = Math.min(3, Math.ceil(Math.log2(numColors)));
+    // Calculate appropriate initial clusters based on desired colors
+    const initialClusters = Math.ceil(Math.sqrt(paletteSize));
     const medianCutColors = medianCut(colors, initialClusters);
-    const kMeansColors = kMeansClustering(medianCutColors, numColors);
+    const kMeansColors = kMeansClustering(medianCutColors, paletteSize);
 
     return kMeansColors
       .map((color) => ({
@@ -129,9 +140,18 @@ export async function extractColors(
       }))
       .sort((a, b) => b.weight - a.weight);
   } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Color extraction failed: ${error.message}`);
-    }
-    throw error;
+    const fallback = options.fallbackColors ?? DEFAULT_FALLBACK_COLORS;
+
+    console.error(
+      "Failed to extract colors:",
+      error instanceof Error ? error.message : "Unknown error",
+    );
+
+    return fallback.slice(0, paletteSize).map((color) => ({
+      ...color,
+      weight:
+        color.weight /
+        fallback.slice(0, paletteSize).reduce((sum, c) => sum + c.weight, 0),
+    }));
   }
 }

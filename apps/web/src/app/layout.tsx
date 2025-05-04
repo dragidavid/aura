@@ -3,6 +3,8 @@ import { Analytics } from "@vercel/analytics/react";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 
+import { Header } from "@/components/header";
+
 import { cn } from "@/lib/cn";
 
 import type { Metadata } from "next";
@@ -22,10 +24,21 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      dir="ltr"
       className={cn(GeistSans.variable, GeistMono.variable, "antialiased")}
     >
-      <body className={cn("font-mono", "bg-black text-white")}>
-        {children}
+      <body
+        className={cn(
+          "flex h-dvh flex-col",
+          "bg-black text-white",
+          "selection:bg-white selection:text-black",
+        )}
+      >
+        <Header />
+
+        <main className={cn("relative flex grow overflow-hidden px-2")}>
+          {children}
+        </main>
 
         <Analytics />
       </body>

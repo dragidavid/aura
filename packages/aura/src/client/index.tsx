@@ -2,37 +2,50 @@ import { useState, useEffect } from "react";
 
 import { extractColors } from "./extract";
 
-import type { AuraColor } from "../types";
+import { DEFAULT_FALLBACK_COLORS } from "../core";
 
-type AuraResponse = {
-  colors: AuraColor[];
-  isLoading: boolean;
-  error: Error | null;
-};
+import type { AuraColor, AuraResponse } from "../types";
 
 /**
- * A React hook that extracts dominant colors from an image URL.
+ * React hook for extracting colors from an image URL.
  *
- * @param imageUrl - The URL of the image to extract colors from. Must be CORS-enabled or from the same origin.
- * @param numColors - The number of colors to extract from the image. Defaults to 6.
- * @returns An object containing the extracted colors, a loading state, and an error state.
+ * @param imageUrl - URL of the image
+ * @param options - Configuration options
+ * @param options.paletteSize - Number of colors to extract (1-12)
+ * @param options.fallbackColors - Custom fallback colors
+ * @param options.onError - Error callback function
+ * @returns Object containing colors, loading state, and error state
  */
-export function useAura(imageUrl: string, numColors: number = 6): AuraResponse {
+export function useAura(
+  imageUrl: string,
+  options: {
+    paletteSize?: number;
+    fallbackColors?: AuraColor[];
+    onError?: (error: Error) => void;
+  } = {},
+): AuraResponse {
   const [state, setState] = useState<AuraResponse>({
     colors: [],
     isLoading: true,
     error: null,
   });
 
+  const paletteSize = options.paletteSize ?? 6;
+  const fallbackColors = options.fallbackColors ?? DEFAULT_FALLBACK_COLORS;
+
   useEffect(() => {
     if (!imageUrl) {
-      setState({ colors: [], isLoading: false, error: null });
+      setState({
+        colors: fallbackColors.slice(0, paletteSize),
+        isLoading: false,
+        error: null,
+      });
 
       return;
     }
 
-    let abortController = new AbortController();
     let mounted = true;
+    const abortController = new AbortController();
 
     const getColors = async () => {
       try {
@@ -40,15 +53,19 @@ export function useAura(imageUrl: string, numColors: number = 6): AuraResponse {
 
         const timeoutId = setTimeout(() => {
           if (mounted) {
-            setState((prev) => ({
-              ...prev,
-              error: new Error("Color extraction timed out"),
-              isLoading: false,
-            }));
-          }
-        }, 10000); // 10 second timeout
+            const timeoutError = new Error("Color extraction timed out");
 
-        const result = await extractColors(imageUrl, numColors);
+            setState({
+              colors: fallbackColors.slice(0, paletteSize),
+              isLoading: false,
+              error: timeoutError,
+            });
+
+            options.onError?.(timeoutError);
+          }
+        }, 10000);
+
+        const result = await extractColors(imageUrl, { paletteSize });
 
         clearTimeout(timeoutId);
 
@@ -60,13 +77,17 @@ export function useAura(imageUrl: string, numColors: number = 6): AuraResponse {
           });
         }
       } catch (err) {
-        if (mounted) {
-          setState({
-            colors: [],
-            isLoading: false,
-            error: err instanceof Error ? err : new Error(String(err)),
-          });
-        }
+        if (!mounted) return;
+
+        const error = err instanceof Error ? err : new Error(String(err));
+
+        setState({
+          colors: fallbackColors.slice(0, paletteSize),
+          isLoading: false,
+          error,
+        });
+
+        options.onError?.(error);
       }
     };
 
@@ -76,7 +97,7 @@ export function useAura(imageUrl: string, numColors: number = 6): AuraResponse {
       mounted = false;
       abortController.abort();
     };
-  }, [imageUrl, numColors]);
+  }, [imageUrl, paletteSize, options.onError, fallbackColors]);
 
   return state;
 }

@@ -1,7 +1,7 @@
 {
   "name": "@drgd/aura",
   "version": "0.0.2",
-  "description": "Extract beautiful color palettes from any image. Zero config, works everywhere.",
+  "description": "Extract color palettes from any image. Zero config, works everywhere.",
   "license": "MIT",
   "type": "module",
   "publishConfig": {
@@ -40,6 +40,7 @@
     "dev": "tsup --watch",
     "build": "tsup",
     "lint": "tsc",
+    "test": "vitest run",
     "release": "changeset version",
     "pub:release": "pnpm build && pnpm publish --access public"
   },
@@ -57,18 +58,19 @@
       "default": "./dist/server.js"
     }
   },
-  "dependencies": {
-    "sharp": "^0.33.5"
-  },
   "peerDependencies": {
-    "react": "^18.0.0 || ^19.0.0 || ^19.0.0-rc",
-    "react-dom": "^18.0.0 || ^19.0.0 || ^19.0.0-rc"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "sharp": "^0.34.1"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "@types/react": "^19.0.2",
-    "tsup": "^8.3.5",
-    "typescript": "latest"
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^22.14.1",
+    "@types/react": "^19.1.2",
+    "jsdom": "^26.1.0",
+    "tsup": "^8.4.0",
+    "typescript": "latest",
+    "vitest": "^3.1.2"
   },
   "browserslist": [
     "defaults",
