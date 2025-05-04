@@ -86,7 +86,6 @@ const Blob = ({
   );
 };
 
-// --- Configuration ---
 // Ratio of colored blobs to black blobs (e.g., 3 means 3 colored for every 1 black).
 const COLORED_TO_BLACK_RATIO = 3;
 // Percentage (0.0 to 1.0) of blobs that should spawn in the middle horizontal third.
