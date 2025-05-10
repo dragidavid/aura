@@ -22,7 +22,7 @@ export function Carousel({
   images,
   preloadedColors,
 }: {
-  images: { src: string; base64: string }[];
+  images: { src: string }[];
   preloadedColors: Record<number, AuraColor[]>;
 }) {
   const [currentIndex, setCurrentIndex] = useState(START_INDEX);
@@ -75,7 +75,7 @@ export function Carousel({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.2 }}
       className={cn("relative flex size-full overflow-hidden rounded-xl")}
     >
       <ui.In>
@@ -97,8 +97,8 @@ export function Carousel({
                 priority={i === START_INDEX}
                 loading={i === START_INDEX ? "eager" : "lazy"}
                 quality={50}
-                placeholder="blur"
-                blurDataURL={image.base64}
+                // placeholder="blur"
+                // blurDataURL={image.base64}
                 className={cn("size-full object-cover")}
               />
             </div>

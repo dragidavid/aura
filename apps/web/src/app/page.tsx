@@ -1,7 +1,8 @@
+import fs from "fs";
+import path from "path";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getAura } from "@drgd/aura/server";
-import { getPlaiceholder } from "plaiceholder";
 
 import { Carousel } from "@/components/carousel";
 import { TunnelOut } from "@/components/tunnel-out";
@@ -10,43 +11,58 @@ import { cn } from "@/lib/cn";
 
 export const dynamic = "force-dynamic";
 
-async function getImages() {
-  const uniqueSeeds = new Set(
-    Array.from({ length: 5 }, () => Math.floor(Math.random() * 1000)),
-  );
-
-  while (uniqueSeeds.size < 5) {
-    uniqueSeeds.add(Math.floor(Math.random() * 1000));
+async function getImages(): Promise<{ src: string }[]> {
+  const imageDirectory = path.join(process.cwd(), "public/assets");
+  let imageFiles: string[];
+  try {
+    imageFiles = fs
+      .readdirSync(imageDirectory)
+      .filter((file) => file.endsWith(".webp"));
+  } catch (error) {
+    console.error("Failed to read image directory:", error);
+    return [];
   }
 
-  return Promise.all(
-    Array.from(uniqueSeeds).map(async (seed) => {
-      const src = `https://picsum.photos/seed/${seed}/600`;
-      const buffer = await fetch(src).then(async (res) =>
-        Buffer.from(await res.arrayBuffer()),
-      );
-      const { base64 } = await getPlaiceholder(buffer);
+  if (imageFiles.length === 0) {
+    return [];
+  }
 
-      return {
-        src,
-        base64,
-      };
-    }),
-  );
+  const shuffled = imageFiles.sort(() => 0.5 - Math.random());
+  const selectedFiles = shuffled.slice(0, Math.min(5, imageFiles.length));
+
+  return selectedFiles.map((file) => {
+    return {
+      src: `/assets/${file}`, // Path for next/image
+    };
+  });
 }
 
-async function getColors(images: { src: string; base64: string }[]) {
+// Updated to pass Buffer directly to getAura
+async function getColors(images: { src: string }[]) {
   const colorsArray = await Promise.all(
-    images.map((image) => getAura(image.src)),
+    images.map(async (image, index) => {
+      const fileSystemPath = path.join(process.cwd(), "public", image.src);
+      try {
+        const imageBuffer = fs.readFileSync(fileSystemPath);
+        return getAura(imageBuffer); // Pass Buffer directly to getAura
+      } catch (error) {
+        console.error(`Failed to read image ${image.src} for getAura:`, error);
+        return []; // Or a default AuraColor[]
+      }
+    }),
   );
 
   return Object.fromEntries(
+    // Key by numerical index, corresponding to the order in the images array
     colorsArray.map((colors, index) => [index, colors]),
   );
 }
 
 async function Images() {
   const images = await getImages();
+  if (images.length === 0) {
+    return <p>No images found to display.</p>;
+  }
   const preloadedColors = await getColors(images);
 
   return <Carousel images={images} preloadedColors={preloadedColors} />;
