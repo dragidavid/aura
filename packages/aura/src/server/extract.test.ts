@@ -33,7 +33,7 @@ function createMockResponse(
   status: number,
   ok: boolean,
   headers: Record<string, string> = {},
-  buffer?: ArrayBuffer,
+  buffer?: ArrayBuffer
 ): Partial<Response> {
   const responseHeaders = new Headers(headers);
 
@@ -76,7 +76,7 @@ describe("getAura (Server Extract)", () => {
     const mockSharpOutput = createMockSharpOutput(50, 50);
 
     mockFetch.mockResolvedValueOnce(
-      createMockResponse(200, true, {}, mockImageBuffer),
+      createMockResponse(200, true, {}, mockImageBuffer)
     );
     mockSharpInstance.metadata.mockResolvedValueOnce({
       width: 100,
@@ -87,7 +87,7 @@ describe("getAura (Server Extract)", () => {
     const colors = await getAura("https://example.com/valid.jpg");
 
     expect(core.validateImageUrl).toHaveBeenCalledWith(
-      "https://example.com/valid.jpg",
+      "https://example.com/valid.jpg"
     );
     expect(mockFetch).toHaveBeenCalledOnce();
     expect(sharp).toHaveBeenCalledWith(Buffer.from(mockImageBuffer));
@@ -101,7 +101,7 @@ describe("getAura (Server Extract)", () => {
 
   it("should throw if URL validation fails", async () => {
     vi.mocked(core.validateImageUrl).mockRejectedValueOnce(
-      new Error("Invalid URL"),
+      new Error("Invalid URL")
     );
 
     await expect(getAura("invalid-url")).rejects.toThrow("Invalid URL");
@@ -115,7 +115,7 @@ describe("getAura (Server Extract)", () => {
     const mockSharpOutput = createMockSharpOutput(50, 50);
 
     mockFetch.mockResolvedValueOnce(
-      createMockResponse(200, true, {}, mockImageBuffer),
+      createMockResponse(200, true, {}, mockImageBuffer)
     );
     mockSharpInstance.metadata.mockResolvedValueOnce({
       width: 100,
@@ -140,7 +140,7 @@ describe("getAura (Server Extract)", () => {
     colors.forEach((color, index) => {
       expect(color.hex).toBe(DEFAULT_FALLBACK_COLORS[index]?.hex);
       expect(color.weight).toBeCloseTo(
-        DEFAULT_FALLBACK_COLORS[index]?.weight ?? 0,
+        DEFAULT_FALLBACK_COLORS[index]?.weight ?? 0
       );
     });
 
@@ -156,7 +156,7 @@ describe("getAura (Server Extract)", () => {
     colors.forEach((color, index) => {
       expect(color.hex).toBe(DEFAULT_FALLBACK_COLORS[index]?.hex);
       expect(color.weight).toBeCloseTo(
-        DEFAULT_FALLBACK_COLORS[index]?.weight ?? 0,
+        DEFAULT_FALLBACK_COLORS[index]?.weight ?? 0
       );
     });
 
@@ -167,7 +167,7 @@ describe("getAura (Server Extract)", () => {
     const mockImageBuffer = new ArrayBuffer(100);
 
     mockFetch.mockResolvedValueOnce(
-      createMockResponse(200, true, {}, mockImageBuffer),
+      createMockResponse(200, true, {}, mockImageBuffer)
     );
     mockSharpInstance.metadata.mockResolvedValueOnce({
       width: 100,
@@ -182,7 +182,7 @@ describe("getAura (Server Extract)", () => {
     colors.forEach((color, index) => {
       expect(color.hex).toBe(DEFAULT_FALLBACK_COLORS[index]?.hex);
       expect(color.weight).toBeCloseTo(
-        DEFAULT_FALLBACK_COLORS[index]?.weight ?? 0,
+        DEFAULT_FALLBACK_COLORS[index]?.weight ?? 0
       );
     });
   });
@@ -192,7 +192,7 @@ describe("getAura (Server Extract)", () => {
     const mockSharpOutput = createMockSharpOutput(50, 50);
 
     mockFetch.mockResolvedValueOnce(
-      createMockResponse(200, true, {}, mockImageBuffer),
+      createMockResponse(200, true, {}, mockImageBuffer)
     );
     mockSharpInstance.metadata.mockResolvedValueOnce({
       width: 100,
@@ -223,10 +223,10 @@ describe("getAura (Server Extract)", () => {
 
   it("should throw if paletteSize is out of range", async () => {
     await expect(
-      getAura("https://example.com/valid.jpg", { paletteSize: 0 }),
+      getAura("https://example.com/valid.jpg", { paletteSize: 0 })
     ).rejects.toThrow(/Number of colors must be between 1 and 12/i);
     await expect(
-      getAura("https://example.com/valid.jpg", { paletteSize: 13 }),
+      getAura("https://example.com/valid.jpg", { paletteSize: 13 })
     ).rejects.toThrow(/Number of colors must be between 1 and 12/i);
   });
 });

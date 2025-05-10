@@ -76,7 +76,7 @@ export function Carousel({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className={cn("relative flex size-full overflow-hidden rounded-lg")}
+      className={cn("relative flex size-full overflow-hidden rounded-xl")}
     >
       <ui.In>
         <Background colors={currentColors} />
@@ -93,6 +93,7 @@ export function Carousel({
                 src={image.src}
                 alt={`Carousel image ${i + 1}`}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 priority={i === START_INDEX}
                 loading={i === START_INDEX ? "eager" : "lazy"}
                 quality={50}
@@ -111,16 +112,16 @@ export function Carousel({
         onClick={scrollPrev}
         aria-label="Previous image"
         className={cn(
-          "absolute top-1/2 left-4 z-10 hidden -translate-y-1/2 rounded-full p-2",
+          "absolute top-1/2 left-4 z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full",
           "border border-white/10 bg-black/20",
           "transition-colors duration-100",
-          "hover:bg-white/10",
-          "sm:block",
+          "hover:cursor-w-resize hover:bg-white/20",
+          "sm:grid",
         )}
       >
         <svg
           viewBox="0 0 24 24"
-          className={cn("size-5", "fill-none stroke-current")}
+          className={cn("-ml-0.5 size-6", "fill-none stroke-current")}
         >
           <path
             strokeLinecap="round"
@@ -135,16 +136,16 @@ export function Carousel({
         onClick={scrollNext}
         aria-label="Next image"
         className={cn(
-          "absolute top-1/2 right-4 z-10 hidden -translate-y-1/2 rounded-full p-2",
+          "absolute top-1/2 right-4 z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full",
           "border border-white/10 bg-black/20",
           "transition-colors duration-100",
-          "hover:bg-white/10",
-          "sm:block",
+          "hover:cursor-e-resize hover:bg-white/20",
+          "sm:grid",
         )}
       >
         <svg
           viewBox="0 0 24 24"
-          className={cn("size-5", "fill-none stroke-current")}
+          className={cn("ml-0.5 size-6", "fill-none stroke-current")}
         >
           <path
             strokeLinecap="round"

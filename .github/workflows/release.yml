@@ -1,4 +1,4 @@
-name: Release
+name: release
 
 on:
   push:
@@ -26,19 +26,19 @@ jobs:
           version: 10.9.0
           run_install: false
 
-      - name: Install Node.js
+      - name: Install node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: pnpm install
 
-      - name: Build the package
+      - name: Build package
         run: pnpm aura:build
 
-      - name: Create Release PR or Publish to NPM
+      - name: Create release
         id: changesets
         uses: changesets/action@v1
         with:

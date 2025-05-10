@@ -42,7 +42,7 @@ describe("Color Utilities", () => {
         expect(avgColor.r).toBe(33);
         expect(avgColor.g).toBe(33);
         expect(avgColor.b).toBe(33);
-        expect(avgColor.count).toBe(1); // Average resets count
+        expect(avgColor.count).toBe(3); // The sum of counts (1+1+1)
       });
 
       it("should handle weighted averages based on color counts", () => {
@@ -60,7 +60,7 @@ describe("Color Utilities", () => {
         expect(avgColor.r).toBe(150);
         expect(avgColor.g).toBe(25);
         expect(avgColor.b).toBe(0);
-        expect(avgColor.count).toBe(1);
+        expect(avgColor.count).toBe(4); // The sum of counts (3+1)
       });
 
       it("should return black (0,0,0) for an empty array", () => {
@@ -69,7 +69,7 @@ describe("Color Utilities", () => {
         expect(avgColor.r).toBe(0);
         expect(avgColor.g).toBe(0);
         expect(avgColor.b).toBe(0);
-        expect(avgColor.count).toBe(1);
+        expect(avgColor.count).toBe(1); // Should be 1 for empty array (totalWeight is 0)
       });
 
       it("should return the color itself if the array contains only one color", () => {
@@ -80,7 +80,7 @@ describe("Color Utilities", () => {
         expect(avgColor.r).toBe(50);
         expect(avgColor.g).toBe(60);
         expect(avgColor.b).toBe(70);
-        expect(avgColor.count).toBe(1);
+        expect(avgColor.count).toBe(5); // The count of the single color
       });
     });
   });

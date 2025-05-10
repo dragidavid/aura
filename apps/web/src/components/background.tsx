@@ -116,13 +116,13 @@ function Scene({ colors }: { colors: AuraColor[] }) {
 
       if (isInMiddleThird) {
         relativeInitialX = MathUtils.randFloat(-1 / 6, 1 / 6);
-        scaleRange = [0.75, 1.44];
+        scaleRange = [0.83, 1.54];
       } else {
         relativeInitialX =
           Math.random() < 0.5
             ? MathUtils.randFloat(-0.5, -1 / 6)
             : MathUtils.randFloat(1 / 6, 0.5);
-        scaleRange = [0.4, 0.75];
+        scaleRange = [0.43, 0.83];
       }
 
       let scaleMultiplier = MathUtils.randFloat(scaleRange[0], scaleRange[1]);
@@ -260,7 +260,17 @@ export function Background({ colors }: { colors: AuraColor[] }) {
         className={cn(
           "fixed inset-0 -z-10",
           "pointer-events-none",
-          "backdrop-blur-3xl backdrop-brightness-110 backdrop-saturate-200",
+          "backdrop-blur-2xl backdrop-brightness-110 backdrop-saturate-200",
+          "sm:backdrop-blur-3xl",
+        )}
+      />
+
+      <div
+        className={cn(
+          "fixed inset-0 -z-10",
+          "pointer-events-none",
+          "bg-radial from-black/5 to-black/30",
+          "sm:from-black/20 sm:to-black/60",
         )}
       />
     </Suspense>

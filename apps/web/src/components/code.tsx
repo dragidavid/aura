@@ -43,9 +43,10 @@ const theme = {
 type Props = {
   code: string;
   language?: string;
+  className?: string;
 };
 
-export function Code({ code, language = "jsx" }: Props) {
+export function Code({ code, language = "jsx", className }: Props) {
   const [copying, setCopying] = useState(0);
 
   const onCopy = useCallback(() => {
@@ -66,7 +67,7 @@ export function Code({ code, language = "jsx" }: Props) {
           "absolute top-3 right-3 z-10 grid size-8 place-items-center rounded-md",
           "border border-white/10 bg-black/20 opacity-0",
           "transition-opacity,colors duration-100",
-          "hover:cursor-pointer hover:bg-white/10",
+          "hover:cursor-pointer hover:bg-white/20",
           "group-hover:opacity-100",
         )}
       >
@@ -101,8 +102,9 @@ export function Code({ code, language = "jsx" }: Props) {
           <pre
             style={style}
             className={cn(
-              "overflow-x-scroll rounded-xl p-4",
+              "my-6 overflow-x-scroll rounded-xl p-4",
               "border border-white/10 bg-radial-[at_-10%_-20%] from-white/10 to-black [background-size:170%_120%]",
+              className,
             )}
           >
             {tokens.map((line, i) => (

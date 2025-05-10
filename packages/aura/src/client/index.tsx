@@ -22,7 +22,7 @@ export function useAura(
     paletteSize?: number;
     fallbackColors?: AuraColor[];
     onError?: (error: Error) => void;
-  } = {},
+  } = {}
 ): AuraResponse {
   const [state, setState] = useState<AuraResponse>({
     colors: [],
