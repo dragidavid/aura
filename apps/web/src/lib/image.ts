@@ -1,4 +1,4 @@
-export function getImages(count: number, max: number): string[] {
+export function getRandomImages(count: number, max: number): string[] {
   if (count > max) {
     throw new Error(
       `[@drgd/aura] - Requested count exceeds total available images.`,

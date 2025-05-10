@@ -1,30 +1,46 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { useAura } from "@drgd/aura/client";
 import { motion, AnimatePresence } from "motion/react";
 
 import { cn } from "@/lib/cn";
+import { getShuffledArray } from "@/lib/common";
 
 import type { AuraColor } from "@drgd/aura";
 
 const COLOR_OPTIONS = [1, 6, 12];
-const INITIAL_IMAGE = "https://picsum.photos/seed/1/400";
+const TOTAL_IMAGES = 30;
+const INITIAL_IMAGE_NUMBER = 1;
 
 export function Demo() {
-  const [imageUrl, setImageUrl] = useState(INITIAL_IMAGE);
   const [paletteSize, setPaletteSize] = useState(COLOR_OPTIONS[1]);
+  const [imageSequence, setImageSequence] = useState<number[]>(() => [
+    INITIAL_IMAGE_NUMBER,
+  ]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    setImageSequence(getShuffledArray(TOTAL_IMAGES));
+    setCurrentIndex(0);
+  }, []);
+
+  const currentImageNumber =
+    imageSequence[currentIndex] ?? INITIAL_IMAGE_NUMBER;
+  const imageUrl = `/assets/${currentImageNumber}.webp`;
 
   const { colors, isLoading, error } = useAura(imageUrl, {
     paletteSize,
   });
 
   const getNewImage = () => {
-    const randomSeed = Math.floor(Math.random() * 1000);
-
-    setImageUrl(`https://picsum.photos/seed/${randomSeed}/400`);
+    if (imageSequence.length > 0) {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % imageSequence.length);
+    }
   };
+
+  console.log(isLoading);
 
   return (
     <div
@@ -79,26 +95,15 @@ export function Demo() {
                 transition={{ duration: 0.2 }}
                 className={cn("absolute inset-0")}
               >
-                {error ? (
-                  <div
-                    className={cn(
-                      "flex size-full items-center justify-center rounded-xl text-2xl",
-                      "bg-white/5",
-                    )}
-                  >
-                    <span>×</span>
-                  </div>
-                ) : (
-                  <Image
-                    src={imageUrl}
-                    alt="Sample"
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    priority
-                    quality={50}
-                    className={cn("rounded-xl object-cover")}
-                  />
-                )}
+                <Image
+                  src={imageUrl}
+                  alt={`Asset ${currentImageNumber}`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority
+                  quality={50}
+                  className={cn("rounded-xl object-cover")}
+                />
               </motion.div>
             )}
           </AnimatePresence>

@@ -8,7 +8,7 @@ import { Carousel } from "@/components/carousel";
 import { TunnelOut } from "@/components/tunnel-out";
 
 import { cn } from "@/lib/cn";
-import { getImages } from "@/lib/image";
+import { getRandomImages } from "@/lib/image";
 
 async function getColors(images: string[]) {
   const colorsArray = await Promise.all(
@@ -33,7 +33,7 @@ async function getColors(images: string[]) {
 }
 
 async function Images() {
-  const images = getImages(5, 30);
+  const images = getRandomImages(5, 30);
   const preloadedColors = await getColors(images);
 
   return <Carousel images={images} preloadedColors={preloadedColors} />;
