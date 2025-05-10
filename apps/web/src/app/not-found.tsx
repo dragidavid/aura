@@ -11,14 +11,11 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <div
-      className={cn("fixed inset-0 flex items-center justify-center font-mono")}
+      className={cn(
+        "fixed inset-0 flex items-center justify-center font-serif font-medium tracking-tight",
+      )}
     >
-      <h2
-        className={cn(
-          "mr-6 pr-6 text-xl font-medium",
-          "border-r border-white/20",
-        )}
-      >
+      <h2 className={cn("mr-6 pr-6 text-2xl", "border-r border-white/20")}>
         404
       </h2>
 
