@@ -59,7 +59,7 @@ describe("validateImageUrl", () => {
 
   it("should reject for an invalid URL format", async () => {
     await expect(validateImageUrl("invalid-url")).rejects.toThrow(
-      "Image validation failed: Invalid image URL format"
+      "[@drgd/aura] - Image validation failed: Invalid image URL format"
     );
   });
 
@@ -67,12 +67,12 @@ describe("validateImageUrl", () => {
     await expect(
       validateImageUrl("http://example.com/image.jpg")
     ).rejects.toThrow(
-      "Image validation failed: Only HTTPS and data URLs are supported"
+      "[@drgd/aura] - Image validation failed: Only HTTPS (or HTTP for localhost) and data URLs are supported"
     );
     await expect(
       validateImageUrl("ftp://example.com/image.jpg")
     ).rejects.toThrow(
-      "Image validation failed: Only HTTPS and data URLs are supported"
+      "[@drgd/aura] - Image validation failed: Only HTTPS (or HTTP for localhost) and data URLs are supported"
     );
   });
 

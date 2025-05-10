@@ -44,7 +44,7 @@ export async function extractColors(
   const paletteSize = options.paletteSize ?? 6;
 
   if (paletteSize < 1 || paletteSize > 12) {
-    throw new Error("Number of colors must be between 1 and 12");
+    throw new Error("[@drgd/aura] - Number of colors must be between 1 and 12");
   }
 
   // Handle URL validation separately if input is a string and validation is enabled
@@ -92,19 +92,23 @@ export async function extractColors(
       clearTimeout(timeoutId);
 
       if (!response.ok)
-        throw new Error(`Failed to fetch image: ${response.statusText}`);
+        throw new Error(
+          `[@drgd/aura] - Failed to fetch image: ${response.statusText}`
+        );
 
       const arrayBuffer = await response.arrayBuffer();
       imageProcessingBuffer = Buffer.from(arrayBuffer);
     } else {
-      throw new Error("Invalid input: Must be a URL string or a Buffer.");
+      throw new Error(
+        "[@drgd/aura] - Invalid input: Must be a URL string or a Buffer"
+      );
     }
 
     const image = sharp(imageProcessingBuffer);
     const metadata = await image.metadata();
 
     if (!metadata.width || !metadata.height) {
-      throw new Error("Invalid image dimensions");
+      throw new Error("[@drgd/aura] - Invalid image dimensions");
     }
 
     // Optimize image processing

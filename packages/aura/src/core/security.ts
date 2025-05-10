@@ -25,12 +25,20 @@ export async function validateImageUrl(url: string): Promise<boolean> {
       throw new Error("Invalid image URL format");
     }
 
-    if (!(parsed.protocol === "https:" || url.startsWith("data:"))) {
-      throw new Error("Only HTTPS and data URLs are supported");
+    // Allow http for localhost, otherwise require https or data URLs
+    const isLocalhost =
+      parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
+    const isHttp = parsed.protocol === "http:";
+    const isHttps = parsed.protocol === "https:";
+    const isDataUrl = url.startsWith("data:");
+
+    if (!((isHttp && isLocalhost) || isHttps || isDataUrl)) {
+      throw new Error(
+        "Only HTTPS (or HTTP for localhost) and data URLs are supported"
+      );
     }
 
-    // Handle data URLs
-    if (url.startsWith("data:")) {
+    if (isDataUrl) {
       const mime = url.split(",")[0]?.split(":")[1]?.split(";")[0];
 
       if (!mime || !ALLOWED_IMAGE_TYPES.includes(mime)) {
@@ -42,13 +50,13 @@ export async function validateImageUrl(url: string): Promise<boolean> {
       return true;
     }
 
+    // For http/https, proceed with HEAD/GET requests
     try {
-      // Try HEAD request first
       const headResponse = await fetch(url, {
         method: "HEAD",
         headers: { Accept: "image/*" },
         mode: "cors",
-        credentials: "omit", // Prevent sending cookies for security
+        credentials: "omit",
       });
 
       if (headResponse.ok) {
@@ -62,7 +70,6 @@ export async function validateImageUrl(url: string): Promise<boolean> {
             `Invalid image type. Supported types: ${ALLOWED_IMAGE_TYPES.join(", ")}`
           );
         }
-
         const contentLength = headResponse.headers.get("content-length");
 
         if (contentLength && parseInt(contentLength) > MAX_IMAGE_SIZE) {
@@ -73,15 +80,13 @@ export async function validateImageUrl(url: string): Promise<boolean> {
 
         return true;
       }
-    } catch (_) {}
+    } catch (e) {
+      // HEAD request failed or threw, fall back to GET with range if necessary
+    }
 
-    // Fallback: GET request with range header
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        Accept: "image/*",
-        Range: "bytes=0-1024", // Only request first KB to check type
-      },
+      headers: { Accept: "image/*", Range: "bytes=0-1024" },
       mode: "cors",
       credentials: "omit",
     });
