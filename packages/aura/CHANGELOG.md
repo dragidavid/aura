@@ -1,5 +1,15 @@
 # @drgd/aura
 
+## 0.1.1
+
+### Patch Changes
+
+- 0dbd636: Fix color weight calculation in `aura`
+
+  ##### Bug Fixes
+
+  - fix the weight calculation (645f376d)
+
 ## 0.1.0
 
 ### Minor Changes
