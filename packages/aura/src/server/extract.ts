@@ -55,10 +55,10 @@ export async function extractColors(
   ) {
     try {
       await validateImageUrl(imageUrlOrBuffer);
-    } catch (validationError) {
+    } catch (e) {
       // If validateImageUrl throws, re-throw the error to make extractColors reject.
       // This is expected by tests checking for URL validation failures.
-      throw validationError;
+      throw e;
     }
   }
 
@@ -84,12 +84,16 @@ export async function extractColors(
         () => controller.abort(),
         options.timeout ?? 10000
       );
+
       const response = await fetch(imageUrlOrBuffer, {
         signal: controller.signal,
       });
+
       clearTimeout(timeoutId);
+
       if (!response.ok)
         throw new Error(`Failed to fetch image: ${response.statusText}`);
+
       const arrayBuffer = await response.arrayBuffer();
       imageProcessingBuffer = Buffer.from(arrayBuffer);
     } else {
@@ -155,15 +159,14 @@ export async function extractColors(
         weight: color.count / totalPixels,
       }))
       .sort((a, b) => b.weight - a.weight);
-  } catch (processingError) {
+  } catch (e) {
     // This catch block now handles errors from fetching (for valid URLs) or sharp processing.
     const fallback = options.fallbackColors ?? DEFAULT_FALLBACK_COLORS;
+
     console.error(
-      "[@drgd/aura] - Failed to extract colors during processing:",
-      processingError instanceof Error
-        ? processingError.message
-        : "Unknown error"
+      `[@drgd/aura] - Failed to extract colors during processing: ${e instanceof Error ? e.message : "Unknown error"}`
     );
+
     return fallback.slice(0, paletteSize).map((color) => ({
       ...color,
       weight:

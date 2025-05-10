@@ -2,7 +2,6 @@ const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
   "image/png",
   "image/webp",
-  "image/gif",
   "image/avif",
 ];
 
@@ -74,9 +73,7 @@ export async function validateImageUrl(url: string): Promise<boolean> {
 
         return true;
       }
-    } catch (headError) {
-      // HEAD request failed, fall back to GET with range
-    }
+    } catch (_) {}
 
     // Fallback: GET request with range header
     const response = await fetch(url, {
@@ -105,9 +102,9 @@ export async function validateImageUrl(url: string): Promise<boolean> {
     }
 
     return true;
-  } catch (error) {
+  } catch (e) {
     throw new Error(
-      `Image validation failed: ${error instanceof Error ? error.message : "Unknown error"}`
+      `[@drgd/aura] - Image validation failed: ${e instanceof Error ? e.message : "Unknown error"}`
     );
   }
 }

@@ -61,7 +61,7 @@ function createMockSharpOutput(width = 10, height = 10, channels = 3) {
   };
 }
 
-describe("getAura (Server Extract)", () => {
+describe("getAura", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(core.validateImageUrl).mockResolvedValue(true);
@@ -100,7 +100,7 @@ describe("getAura (Server Extract)", () => {
   });
 
   it("should process a valid Buffer input without calling validateImageUrl", async () => {
-    const mockImageBuffer = Buffer.from("dummy-buffer-data"); // More realistic buffer if needed for sharp mock
+    const mockImageBuffer = Buffer.from("dummy-buffer-data");
     const mockSharpOutput = createMockSharpOutput(30, 30);
 
     mockSharpInstance.metadata.mockResolvedValueOnce({ width: 30, height: 30 });
