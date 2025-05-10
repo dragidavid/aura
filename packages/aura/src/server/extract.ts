@@ -20,7 +20,7 @@ const BATCH_SIZE = 1000; // Number of pixels to process in each batch
  * Uses Sharp for image processing and combines median cut with k-means clustering.
  * Includes automatic image scaling and optimization.
  *
- * @param imageUrl - URL of the image
+ * @param imageUrlOrBuffer - URL of the image or a Buffer
  * @param options - Configuration options
  * @param options.paletteSize - Number of colors to extract (1-12)
  * @param options.timeout - Maximum processing time in ms
@@ -31,7 +31,7 @@ const BATCH_SIZE = 1000; // Number of pixels to process in each batch
  * @throws {Error} When image processing fails
  */
 export async function extractColors(
-  imageUrl: string,
+  imageUrlOrBuffer: string | Buffer,
   options: {
     paletteSize?: number;
     timeout?: number;
@@ -41,46 +41,62 @@ export async function extractColors(
     fallbackColors?: AuraColor[];
   } = {}
 ): Promise<AuraColor[]> {
-  if (!imageUrl) throw new Error("Image URL is required");
-
   const paletteSize = options.paletteSize ?? 6;
 
   if (paletteSize < 1 || paletteSize > 12) {
     throw new Error("Number of colors must be between 1 and 12");
   }
 
-  // Validate URL if enabled
-  if (options.validateUrl !== false) {
-    await validateImageUrl(imageUrl);
+  // Handle URL validation separately if input is a string and validation is enabled
+  if (
+    typeof imageUrlOrBuffer === "string" &&
+    options.validateUrl !== false &&
+    !imageUrlOrBuffer.startsWith("data:")
+  ) {
+    try {
+      await validateImageUrl(imageUrlOrBuffer);
+    } catch (validationError) {
+      // If validateImageUrl throws, re-throw the error to make extractColors reject.
+      // This is expected by tests checking for URL validation failures.
+      throw validationError;
+    }
   }
 
-  // Set quality-based dimensions
-  const targetSize =
-    options.quality === "low"
-      ? 200
-      : options.quality === "medium"
-        ? 400
-        : options.quality === "high"
-          ? 800
-          : MAX_IMAGE_SIZE;
-
+  // Proceed with fetching (if URL) and processing, with fallbacks for errors in this stage
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(
-      () => controller.abort(),
-      options.timeout ?? 10000
-    );
+    let imageProcessingBuffer: Buffer;
+    const targetSize =
+      options.quality === "low"
+        ? 200
+        : options.quality === "medium"
+          ? 400
+          : options.quality === "high"
+            ? 800
+            : MAX_IMAGE_SIZE;
 
-    const response = await fetch(imageUrl, { signal: controller.signal });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    if (Buffer.isBuffer(imageUrlOrBuffer)) {
+      imageProcessingBuffer = imageUrlOrBuffer;
+    } else if (typeof imageUrlOrBuffer === "string") {
+      // Fetch if it's a string (URL or Data URL)
+      // No need to re-validate here if it passed the block above or is a data URL/validation disabled
+      const controller = new AbortController();
+      const timeoutId = setTimeout(
+        () => controller.abort(),
+        options.timeout ?? 10000
+      );
+      const response = await fetch(imageUrlOrBuffer, {
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok)
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      const arrayBuffer = await response.arrayBuffer();
+      imageProcessingBuffer = Buffer.from(arrayBuffer);
+    } else {
+      throw new Error("Invalid input: Must be a URL string or a Buffer.");
     }
 
-    const imageBuffer = await response.arrayBuffer();
-    const image = sharp(Buffer.from(imageBuffer));
+    const image = sharp(imageProcessingBuffer);
     const metadata = await image.metadata();
 
     if (!metadata.width || !metadata.height) {
@@ -139,14 +155,15 @@ export async function extractColors(
         weight: color.count / totalPixels,
       }))
       .sort((a, b) => b.weight - a.weight);
-  } catch (error) {
+  } catch (processingError) {
+    // This catch block now handles errors from fetching (for valid URLs) or sharp processing.
     const fallback = options.fallbackColors ?? DEFAULT_FALLBACK_COLORS;
-
     console.error(
-      "[@drgd/aura] - Failed to extract colors:",
-      error instanceof Error ? error.message : "Unknown error"
+      "[@drgd/aura] - Failed to extract colors during processing:",
+      processingError instanceof Error
+        ? processingError.message
+        : "Unknown error"
     );
-
     return fallback.slice(0, paletteSize).map((color) => ({
       ...color,
       weight:

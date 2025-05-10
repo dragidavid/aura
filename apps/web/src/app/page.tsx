@@ -40,7 +40,7 @@ async function getImages(): Promise<{ src: string }[]> {
 // Updated to pass Buffer directly to getAura
 async function getColors(images: { src: string }[]) {
   const colorsArray = await Promise.all(
-    images.map(async (image, index) => {
+    images.map(async (image) => {
       const fileSystemPath = path.join(process.cwd(), "public", image.src);
       try {
         const imageBuffer = fs.readFileSync(fileSystemPath);

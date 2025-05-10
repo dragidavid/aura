@@ -99,6 +99,26 @@ describe("getAura (Server Extract)", () => {
     expect(colors[0]).toHaveProperty("weight");
   });
 
+  it("should process a valid Buffer input without calling validateImageUrl", async () => {
+    const mockImageBuffer = Buffer.from("dummy-buffer-data"); // More realistic buffer if needed for sharp mock
+    const mockSharpOutput = createMockSharpOutput(30, 30);
+
+    mockSharpInstance.metadata.mockResolvedValueOnce({ width: 30, height: 30 });
+    mockSharpInstance.toBuffer.mockResolvedValueOnce(mockSharpOutput);
+
+    const colors = await getAura(mockImageBuffer);
+
+    expect(core.validateImageUrl).not.toHaveBeenCalled();
+    expect(mockFetch).not.toHaveBeenCalled(); // Should not fetch for buffer input
+    expect(sharp).toHaveBeenCalledWith(mockImageBuffer);
+    expect(mockSharpInstance.toBuffer).toHaveBeenCalledOnce();
+    expect(colors).toBeInstanceOf(Array);
+    expect(colors.length).toBeGreaterThan(0);
+    // Further assertions as in the valid URL test
+    expect(colors[0]).toHaveProperty("hex");
+    expect(colors[0]).toHaveProperty("weight");
+  });
+
   it("should throw if URL validation fails", async () => {
     vi.mocked(core.validateImageUrl).mockRejectedValueOnce(
       new Error("Invalid URL")
