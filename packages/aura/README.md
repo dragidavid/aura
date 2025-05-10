@@ -10,7 +10,7 @@
 
 </div>
 
-![hero](../../apps/web/public/aura.jpeg)
+![hero](https://aura.drgd.fyi/og.jpg)
 
 ## Installation
 
