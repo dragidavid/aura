@@ -10,35 +10,35 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   release:
     if: ${{ github.repository_owner == 'dragidavid' }}
-    name: release
+    name: Release
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v4
-        name: install pnpm
+        name: Install pnpm
         id: pnpm-install
         with:
           version: 10.9.0
           run_install: false
 
-      - name: install node.js
+      - name: Install node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
 
-      - name: install dependencies
+      - name: Install dependencies
         run: pnpm install
 
-      - name: build the package
+      - name: Build package
         run: pnpm aura:build
 
-      - name: create release pr or publish to npm
+      - name: Create release
         id: changesets
         uses: changesets/action@v1
         with:
