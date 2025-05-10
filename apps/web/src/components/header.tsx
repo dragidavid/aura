@@ -1,9 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { cn } from "@/lib/cn";
-
-import logo from "@/../public/aura_logo.png";
 
 export async function Header() {
   const res = await fetch(`https://api.github.com/repos/dragidavid/aura`);
@@ -13,17 +10,33 @@ export async function Header() {
     <header className={cn("sticky top-2 z-50 mt-2 px-2")}>
       <nav
         className={cn(
-          "mx-auto flex h-12 max-w-2xl items-center justify-between rounded-xl px-3",
+          "mx-auto flex h-12 max-w-2xl items-center justify-between rounded-full px-2",
           "border border-white/10 bg-black/20 backdrop-blur-md",
         )}
       >
-        <Link href="/" className={cn("rounded-full", "select-none")}>
-          <Image
-            src={logo}
-            alt="aura logo"
-            className={cn("h-5 w-auto", "pointer-events-none")}
-            priority
-          />
+        <Link
+          href="/"
+          aria-label="main logo"
+          className={cn(
+            "group relative grid size-8 place-items-center rounded-full",
+            "select-none",
+          )}
+        >
+          {[2, 5, 8].map((s, index) => (
+            <div
+              key={index}
+              className={cn(
+                "absolute rounded-full",
+                "transition-colors duration-100",
+                "bg-white/5",
+                "group-hover:bg-white/20",
+              )}
+              style={{
+                width: `calc(var(--spacing) * ${s})`,
+                height: `calc(var(--spacing) * ${s})`,
+              }}
+            />
+          ))}
         </Link>
 
         <div className={cn("flex items-center gap-2")}>
@@ -32,10 +45,10 @@ export async function Header() {
             href="https://github.com/dragidavid/aura"
             target="_blank"
             className={cn(
-              "h-8 rounded-full px-[5px]",
+              "h-8 rounded-full px-1.5",
               "transition-colors duration-100",
-              "border border-white/10",
-              "hover:bg-white/10",
+              "bg-white/5",
+              "hover:bg-white/20",
               data?.stargazers_count && "pr-2",
             )}
           >
@@ -57,10 +70,10 @@ export async function Header() {
             href="https://www.npmjs.com/package/@drgd/aura"
             target="_blank"
             className={cn(
-              "h-8 rounded-full px-[5px]",
+              "h-8 rounded-full px-1.5",
               "transition-colors duration-100",
-              "border border-white/10",
-              "hover:bg-white/10",
+              "bg-white/5",
+              "hover:bg-white/20",
             )}
           >
             <span className={cn("flex h-full items-center")}>
@@ -79,10 +92,10 @@ export async function Header() {
             href="https://x.com/dragidavid"
             target="_blank"
             className={cn(
-              "h-8 rounded-full px-[5px]",
+              "h-8 rounded-full px-1.5",
               "transition-colors duration-100",
-              "border border-white/10",
-              "hover:bg-white/10",
+              "bg-white/5",
+              "hover:bg-white/20",
             )}
           >
             <span className={cn("flex h-full items-center")}>

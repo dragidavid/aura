@@ -1,16 +1,16 @@
-import type { MetadataRoute } from "next";
+import { siteConfig } from "@/config/site";
 
-export const baseUrl = "https://aura.drgd.fyi";
+import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: baseUrl,
+      url: siteConfig.url,
       lastModified: new Date(),
       changeFrequency: "yearly",
     },
     {
-      url: `${baseUrl}/docs`,
+      url: `${siteConfig.url}/docs`,
       lastModified: new Date(),
       changeFrequency: "monthly",
     },

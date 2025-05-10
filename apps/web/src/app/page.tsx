@@ -57,28 +57,76 @@ export default async function Page() {
     <div className={cn("flex w-full flex-col")}>
       <TunnelOut />
 
-      <div className={cn("flex flex-1 flex-col justify-center gap-8 py-8")}>
-        <div className={cn("flex flex-col gap-4 text-center")}>
-          <h1 className={cn("font-mono text-3xl font-black")}>aura</h1>
+      <div
+        className={cn(
+          "flex flex-1 flex-col items-center justify-center gap-12 py-8 text-center",
+        )}
+      >
+        <div className={cn("flex flex-col items-center gap-6")}>
+          <div
+            className={cn(
+              "relative w-fit rounded-full px-6 pb-1",
+              "select-none",
+              "bg-black/20",
+            )}
+          >
+            <h1
+              className={cn(
+                "font-serif-display text-2xl font-semibold tracking-tighter",
+              )}
+            >
+              aura
+            </h1>
+          </div>
 
           <p className="text-white/40">
-            Extract color palettes from any image.
+            Grab colors from any image.
             <br />
             Works on both server and client.
           </p>
         </div>
 
-        <div className={cn("flex justify-center")}>
-          <Link
-            href="/docs"
-            className={cn(
-              "rounded-full px-4 py-2 font-mono text-sm",
-              "transition-colors duration-100",
-              "border border-white/10 bg-black/20 shadow-lg",
-              "hover:bg-white/10",
-            )}
-          >
-            Documentation
+        <div className={cn("w-fit")}>
+          <Link href="/docs" className={cn("group flex gap-3")}>
+            <div
+              className={cn(
+                "rounded-full px-6 py-2",
+                "transition-colors duration-100",
+                "border border-white bg-black/10",
+                "group-hover:bg-white/20",
+              )}
+            >
+              <span className={cn("font-serif font-medium tracking-tight")}>
+                view docs
+              </span>
+            </div>
+            <div
+              className={cn(
+                "relative grid size-[43px] place-items-center rounded-full",
+                "transition-colors duration-100",
+                "border border-white bg-black/10",
+                "group-hover:bg-white/20",
+              )}
+            >
+              <span
+                className={cn(
+                  "absolute -left-3.5 h-0.5 w-[calc(100%-2px)] rounded-full",
+                  "bg-white",
+                )}
+              />
+              <svg
+                viewBox="0 0 24 24"
+                className={cn("ml-0.5 size-6", "fill-none stroke-current")}
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
           </Link>
         </div>
       </div>
@@ -86,7 +134,7 @@ export default async function Page() {
       <div className={cn("flex-1 pb-2", "sm:flex-3")}>
         <div
           className={cn(
-            "relative mx-auto h-full max-h-(--container-lg) max-w-md overflow-hidden rounded-xl p-2",
+            "relative mx-auto h-full max-h-(--container-lg) max-w-md overflow-hidden rounded-2xl p-2",
             "border border-white/10 bg-black/20 shadow-lg backdrop-blur-md",
           )}
         >
