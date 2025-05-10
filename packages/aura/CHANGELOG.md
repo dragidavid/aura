@@ -1,5 +1,13 @@
 # @drgd/aura
 
+## 0.1.2
+
+### Patch Changes
+
+- b0346a4: #### Bug Fixes
+
+  - fix image link in aura readme
+
 ## 0.1.1
 
 ### Patch Changes
