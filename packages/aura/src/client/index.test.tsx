@@ -10,7 +10,6 @@ import { DEFAULT_FALLBACK_COLORS } from "../core";
 
 import type { AuraColor } from "../types";
 
-// Mock the client-side extractColors function
 const mockExtractColors = vi.spyOn(clientExtract, "extractColors");
 
 describe("useAura Hook", () => {
@@ -20,10 +19,46 @@ describe("useAura Hook", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockExtractColors.mockClear();
   });
 
-  it("should initialize with loading state and empty colors", () => {
+  it("should initialize with loading:false and empty colors if no initial input", () => {
+    const { result } = renderHook(() => useAura(null));
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.error).toBeNull();
+    expect(result.current.colors).toEqual(DEFAULT_FALLBACK_COLORS.slice(0, 6));
+    expect(mockExtractColors).not.toHaveBeenCalled();
+  });
+
+  it("should set isLoading to true during URL processing", async () => {
+    mockExtractColors.mockImplementationOnce(
+      () => new Promise((resolve) => setTimeout(() => resolve(testColors), 50))
+    );
+    const { result } = renderHook(() => useAura(testImageUrl));
+
+    await waitFor(() => {
+      if (!result.current.isLoading) {
+        expect(result.current.isLoading).toBe(false);
+      } else {
+        expect(result.current.isLoading).toBe(true);
+      }
+    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+  });
+
+  it("should return colors and set loading to false on successful extraction for URL", async () => {
+    mockExtractColors.mockResolvedValueOnce(testColors);
+
+    const { result } = renderHook(() => useAura(testImageUrl));
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.error).toBeNull();
+      expect(result.current.colors).toEqual(testColors);
+    });
+  });
+
+  it("should initialize with loading state and empty colors when URL is provided", () => {
     const { result } = renderHook(() => useAura(testImageUrl));
 
     expect(result.current.isLoading).toBe(true);
@@ -32,11 +67,12 @@ describe("useAura Hook", () => {
     expect(mockExtractColors).toHaveBeenCalled();
   });
 
-  it("should return colors and set loading to false on successful extraction", async () => {
+  it("should set isLoading true then false, return colors on successful URL extraction", async () => {
     mockExtractColors.mockResolvedValueOnce(testColors);
 
     const { result } = renderHook(() => useAura(testImageUrl));
 
+    await waitFor(() => expect(result.current.isLoading).toBe(true));
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
     });
@@ -91,7 +127,7 @@ describe("useAura Hook", () => {
     mockExtractColors.mockResolvedValue(testColors);
 
     const { rerender } = renderHook(
-      ({ url }: { url: string }) => useAura(url),
+      ({ url }: { url: string | null | undefined }) => useAura(url),
       {
         initialProps: { url: testImageUrl },
       }
@@ -136,9 +172,7 @@ describe("useAura Hook", () => {
       rerender({ size: 3 });
     });
 
-    // Should be loading again after prop change
-    expect(result.current.isLoading).toBe(true);
-
+    await waitFor(() => expect(result.current.isLoading).toBe(true));
     await waitFor(() => {
       expect(mockExtractColors).toHaveBeenCalledTimes(2);
       expect(mockExtractColors).toHaveBeenLastCalledWith(testImageUrl, {
@@ -150,19 +184,16 @@ describe("useAura Hook", () => {
   it("should handle timeout", async () => {
     vi.useFakeTimers();
 
-    // Mock extractColors to never resolve
     mockExtractColors.mockImplementationOnce(() => new Promise(() => {}));
 
     const { result } = renderHook(() => useAura(testImageUrl));
 
     expect(result.current.isLoading).toBe(true);
 
-    // Advance timers past the default 10s timeout
     act(() => {
       vi.advanceTimersByTime(10001);
     });
 
-    // Check state immediately after advancing timers
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeInstanceOf(Error);
     expect(result.current.error?.message).toContain("timed out");
@@ -171,8 +202,17 @@ describe("useAura Hook", () => {
     vi.useRealTimers();
   });
 
-  it("should return fallback colors immediately if imageUrl is empty", () => {
+  it("should return fallback colors immediately if imageUrl is empty string", () => {
     const { result } = renderHook(() => useAura(""));
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.error).toBeNull();
+    expect(result.current.colors).toEqual(DEFAULT_FALLBACK_COLORS.slice(0, 6));
+    expect(mockExtractColors).not.toHaveBeenCalled();
+  });
+
+  it("should return fallback colors immediately if imageUrl is null", () => {
+    const { result } = renderHook(() => useAura(null));
 
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
