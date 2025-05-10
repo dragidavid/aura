@@ -8,61 +8,32 @@ import { Carousel } from "@/components/carousel";
 import { TunnelOut } from "@/components/tunnel-out";
 
 import { cn } from "@/lib/cn";
+import { getImages } from "@/lib/image";
 
-export const dynamic = "force-dynamic";
-
-async function getImages(): Promise<{ src: string }[]> {
-  const imageDirectory = path.join(process.cwd(), "public/assets");
-  let imageFiles: string[];
-  try {
-    imageFiles = fs
-      .readdirSync(imageDirectory)
-      .filter((file) => file.endsWith(".webp"));
-  } catch (error) {
-    console.error("Failed to read image directory:", error);
-    return [];
-  }
-
-  if (imageFiles.length === 0) {
-    return [];
-  }
-
-  const shuffled = imageFiles.sort(() => 0.5 - Math.random());
-  const selectedFiles = shuffled.slice(0, Math.min(5, imageFiles.length));
-
-  return selectedFiles.map((file) => {
-    return {
-      src: `/assets/${file}`, // Path for next/image
-    };
-  });
-}
-
-// Updated to pass Buffer directly to getAura
-async function getColors(images: { src: string }[]) {
+async function getColors(images: string[]) {
   const colorsArray = await Promise.all(
     images.map(async (image) => {
-      const fileSystemPath = path.join(process.cwd(), "public", image.src);
+      const fsPath = path.join(process.cwd(), "public", image);
+
       try {
-        const imageBuffer = fs.readFileSync(fileSystemPath);
-        return getAura(imageBuffer); // Pass Buffer directly to getAura
-      } catch (error) {
-        console.error(`Failed to read image ${image.src} for getAura:`, error);
-        return []; // Or a default AuraColor[]
+        const buffer = fs.readFileSync(fsPath);
+
+        return getAura(buffer);
+      } catch (e) {
+        console.error(`[@drgd/aura] - Failed to read image ${image}:`, e);
+
+        return [];
       }
     }),
   );
 
   return Object.fromEntries(
-    // Key by numerical index, corresponding to the order in the images array
     colorsArray.map((colors, index) => [index, colors]),
   );
 }
 
 async function Images() {
-  const images = await getImages();
-  if (images.length === 0) {
-    return <p>No images found to display.</p>;
-  }
+  const images = getImages(5, 30);
   const preloadedColors = await getColors(images);
 
   return <Carousel images={images} preloadedColors={preloadedColors} />;
