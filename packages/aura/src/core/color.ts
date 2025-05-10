@@ -11,7 +11,7 @@ export class Color {
     public r: number,
     public g: number,
     public b: number,
-    public count: number = 1,
+    public count: number = 1
   ) {}
 
   static average(colors: Color[]): Color {
@@ -47,7 +47,7 @@ export class Color {
         return new Color(
           Math.round(simpleAvgR),
           Math.round(simpleAvgG),
-          Math.round(simpleAvgB),
+          Math.round(simpleAvgB)
         );
       }
 
@@ -59,8 +59,8 @@ export class Color {
     const avgG = Math.round(weightedSum.g / totalWeight);
     const avgB = Math.round(weightedSum.b / totalWeight);
 
-    // The resulting average color conceptually represents a single color point
-    return new Color(avgR, avgG, avgB, 1);
+    // The resulting average color should carry the total weight of the input colors
+    return new Color(avgR, avgG, avgB, totalWeight === 0 ? 1 : totalWeight);
   }
 }
 

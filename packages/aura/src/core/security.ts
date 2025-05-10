@@ -36,7 +36,7 @@ export async function validateImageUrl(url: string): Promise<boolean> {
 
       if (!mime || !ALLOWED_IMAGE_TYPES.includes(mime)) {
         throw new Error(
-          `Invalid image type. Supported types: ${ALLOWED_IMAGE_TYPES.join(", ")}`,
+          `Invalid image type. Supported types: ${ALLOWED_IMAGE_TYPES.join(", ")}`
         );
       }
 
@@ -60,7 +60,7 @@ export async function validateImageUrl(url: string): Promise<boolean> {
           !ALLOWED_IMAGE_TYPES.includes(contentType.toLowerCase())
         ) {
           throw new Error(
-            `Invalid image type. Supported types: ${ALLOWED_IMAGE_TYPES.join(", ")}`,
+            `Invalid image type. Supported types: ${ALLOWED_IMAGE_TYPES.join(", ")}`
           );
         }
 
@@ -68,7 +68,7 @@ export async function validateImageUrl(url: string): Promise<boolean> {
 
         if (contentLength && parseInt(contentLength) > MAX_IMAGE_SIZE) {
           throw new Error(
-            `Image size exceeds maximum allowed size of ${MAX_IMAGE_SIZE / (1024 * 1024)}MB`,
+            `Image size exceeds maximum allowed size of ${MAX_IMAGE_SIZE / (1024 * 1024)}MB`
           );
         }
 
@@ -76,7 +76,6 @@ export async function validateImageUrl(url: string): Promise<boolean> {
       }
     } catch (headError) {
       // HEAD request failed, fall back to GET with range
-      console.warn("HEAD request failed, falling back to GET request");
     }
 
     // Fallback: GET request with range header
@@ -101,14 +100,14 @@ export async function validateImageUrl(url: string): Promise<boolean> {
       !ALLOWED_IMAGE_TYPES.includes(contentType.toLowerCase())
     ) {
       throw new Error(
-        `Unsupported image type. Allowed: ${ALLOWED_IMAGE_TYPES.join(", ")}`,
+        `Unsupported image type. Allowed: ${ALLOWED_IMAGE_TYPES.join(", ")}`
       );
     }
 
     return true;
   } catch (error) {
     throw new Error(
-      `Image validation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+      `Image validation failed: ${error instanceof Error ? error.message : "Unknown error"}`
     );
   }
 }
