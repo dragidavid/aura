@@ -1,6 +1,6 @@
 {
   "name": "@drgd/aura",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Extract color palettes from any image. Works on both server and client.",
   "license": "MIT",
   "type": "module",
