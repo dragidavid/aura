@@ -66,7 +66,7 @@ export default async function Page() {
             </h1>
           </div>
 
-          <p className="text-white/40">
+          <p className="text-white/60">
             Grab colors from any image.
             <br />
             Works on both server and client.
