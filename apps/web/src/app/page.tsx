@@ -121,8 +121,8 @@ export default async function Page() {
       <div className={cn("flex-1 pb-2", "sm:flex-3")}>
         <div
           className={cn(
-            "relative mx-auto h-full max-h-(--container-lg) max-w-md overflow-hidden rounded-2xl p-2",
-            "border border-white/10 bg-black/20 shadow-lg backdrop-blur-md",
+            "relative mx-auto h-full max-h-(--container-lg) max-w-md overflow-hidden rounded-xl p-1",
+            "bg-white/5 inset-ring inset-ring-white/10",
           )}
         >
           <Suspense

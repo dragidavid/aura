@@ -11,7 +11,7 @@ export async function Header() {
       <nav
         className={cn(
           "mx-auto flex h-12 max-w-2xl items-center justify-between rounded-full px-2",
-          "border border-white/10 bg-black/20 backdrop-blur-md",
+          "bg-black/20 inset-ring inset-ring-white/10 backdrop-blur-md",
         )}
       >
         <Link
@@ -28,7 +28,7 @@ export async function Header() {
               className={cn(
                 "absolute rounded-full",
                 "transition-colors duration-100",
-                "bg-white/5",
+                "bg-white/10",
                 "group-hover:bg-white/20",
               )}
               style={{

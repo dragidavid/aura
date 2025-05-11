@@ -7,14 +7,15 @@ import { siteConfig } from "@/config/site";
 
 import type { Metadata } from "next";
 
-const BASIC_USAGE_CLIENT = `"use client";
+const CLIENT_USAGE = `"use client";
 
 import { useAura } from "@drgd/aura/client";
 
 export function Colors({ imageUrl }: { imageUrl: string }) {
+  // e.g., "/assets/my-image.webp" or "https://picsum.photos/200"
   const { colors, isLoading, error } = useAura(imageUrl, {
     paletteSize: 4,
-    onError: (error) => console.error(error)
+    onError: (err) => console.error(err.message),
   });
 
   if (isLoading) return <p>Loading...</p>;
@@ -32,8 +33,8 @@ export function Colors({ imageUrl }: { imageUrl: string }) {
   );
 }`;
 
-const BASIC_USAGE_SERVER = `import { getAura } from "@drgd/aura/server";
-import { Suspense } from "react";
+const SERVER_USAGE_REMOTE = `import { Suspense } from "react";
+import { getAura } from "@drgd/aura/server";
 
 // Server Component that gets the colors
 async function Colors({ imageUrl }: { imageUrl: string }) {
@@ -58,13 +59,56 @@ async function Colors({ imageUrl }: { imageUrl: string }) {
 
 // Parent Server Component
 export default async function Page() {
-  const imageUrl = "https://example.com/image.jpg";
+  const imageUrl = "https://picsum.photos/200";
 
   return (
     <div>
       <h1>Image Colors</h1>
       <Suspense fallback={<p>Loading colors...</p>}>
         <Colors imageUrl={imageUrl} />
+      </Suspense>
+    </div>
+  );
+}`;
+
+const SERVER_USAGE_LOCAL = `import fs from "fs";
+import path from "path";
+import { Suspense } from "react";
+import { getAura } from "@drgd/aura/server";
+
+// Server Component that gets the colors
+async function LocalColors({ imageFileName }: { imageFileName: string }) {
+  const imagePath = path.join(process.cwd(), "public", "assets", imageFileName);
+  let colors;
+
+  try {
+    const imageBuffer = await fs.readFile(imagePath);
+
+    colors = await getAura(imageBuffer, { paletteSize: 8 });
+  } catch (error) {
+    console.error("Failed to process image", error);
+
+    colors = await getAura(Buffer.from(""), { paletteSize: 5 });
+  }
+
+  return (
+    <ul>
+      {colors.map((color) => (
+        <li key={color.hex} style={{ backgroundColor: color.hex }}>
+          {color.hex} - {Math.round(color.weight * 100)}%
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// Parent Server Component
+export default async function Page() {
+  return (
+    <div>
+      <h1>Image Colors</h1>
+      <Suspense fallback={<p>Loading colors...</p>}>
+        <LocalColors imageFileName="/assets/1.webp" />
       </Suspense>
     </div>
   );
@@ -103,14 +147,15 @@ type SectionBadgeProps = {
 
 function SectionBadge({ variant, children }: SectionBadgeProps) {
   const variantStyles = {
-    client: "bg-emerald-400 text-black",
-    server: "bg-rose-400 text-black",
+    client: "bg-emerald-500/30 inset-ring-emerald-500/40",
+    server: "bg-rose-500/30 inset-ring-rose-500/40",
   };
 
   return (
     <div
       className={cn(
-        "text-2xs absolute -top-2.5 rounded-full px-2 py-0.5 font-mono font-bold uppercase",
+        "text-2xs absolute -top-2.5 rounded-full px-2.5 py-0.5 font-mono font-bold uppercase",
+        "inset-ring backdrop-blur-lg",
         variantStyles[variant],
       )}
     >
@@ -170,11 +215,18 @@ export default function Page() {
             Usage
           </h1>
 
-          <p className="text-white/60">
-            Use the <code>useAura</code> hook to extract colors on the client.
-          </p>
+          <div className={cn("space-y-3", "text-white/60")}>
+            <p>
+              Use the <code>useAura</code> hook to extract colors on the client.
+            </p>
 
-          <Code code={BASIC_USAGE_CLIENT} />
+            <p>
+              It accepts a remote image URL or a local static path (e.g., from
+              your <code>public</code> folder).
+            </p>
+          </div>
+
+          <Code code={CLIENT_USAGE} language="tsx" variant="client" />
 
           <div className={cn("flex flex-col gap-6", "text-white/60")}>
             <div className="space-y-3">
@@ -186,22 +238,30 @@ export default function Page() {
               >
                 Parameters
               </h2>
-              <ul className={cn("list-disc space-y-2 pl-6")}>
+              <ul className={cn("list-disc space-y-3 pl-6")}>
                 <li>
-                  <code>imageUrl</code> - URL of the image (required)
+                  <code>imageUrl?: string | null</code>
+                  <ul className={cn("mt-3 list-disc space-y-2 pl-6")}>
+                    <li>URL of the image or a local static path</li>
+                    <li>
+                      Uses default <code>fallbackColors</code> if not provided
+                    </li>
+                  </ul>
                 </li>
                 <li>
-                  <code>options</code>
+                  <code>options?: object</code>
                   <ul className={cn("mt-3 list-disc space-y-2 pl-6")}>
                     <li>
-                      <code>paletteSize</code> - Number of colors to extract
-                      (default: 6, range: 1-12)
+                      <code>paletteSize?: number</code> - Number of colors to
+                      extract (default: 6, range: 1-12)
                     </li>
                     <li>
-                      <code>fallbackColors</code> - Custom fallback colors array
+                      <code>fallbackColors?: AuraColor[]</code> - Custom
+                      fallback colors array
                     </li>
                     <li>
-                      <code>onError</code> - Error callback function
+                      <code>{`onError?: (error: Error) => void`}</code> - Error
+                      callback function
                     </li>
                   </ul>
                 </li>
@@ -219,14 +279,16 @@ export default function Page() {
               </h2>
               <ul className={cn("list-disc space-y-2 pl-6")}>
                 <li>
-                  <code>colors</code> - Array of <code>AuraColor</code> objects
+                  <code>colors: AuraColor[]</code> - Array of extracted (or
+                  fallback) colors, sorted by weight
                 </li>
                 <li>
-                  <code>isLoading</code> - Boolean indicating extraction status
+                  <code>isLoading: boolean</code> - Boolean indicating
+                  extraction status
                 </li>
                 <li>
-                  <code>error</code> - Error object if failed, <code>null</code>{" "}
-                  otherwise
+                  <code>error: Error | null</code> - Error object if failed,{" "}
+                  <code>null</code> otherwise otherwise
                 </li>
               </ul>
             </div>
@@ -265,8 +327,12 @@ export default function Page() {
           <div className={cn("space-y-3", "text-white/60")}>
             <p>
               Use the <code>getAura</code> function inside an async Server
-              Component. To prevent blocking the initial page load while colors
-              are extracted, wrap <code>getAura</code> call in{" "}
+              Component. It accepts a remote image URL or a <code>Buffer</code>.
+            </p>
+
+            <p>
+              To prevent blocking the initial page load while colors are
+              extracted, wrap <code>getAura</code> call in{" "}
               <code>&lt;Suspense&gt;</code>.
             </p>
 
@@ -284,7 +350,19 @@ export default function Page() {
             </p>
           </div>
 
-          <Code code={BASIC_USAGE_SERVER} />
+          <Code
+            code={SERVER_USAGE_REMOTE}
+            language="tsx"
+            title="Example with an image URL"
+            variant="server"
+          />
+
+          <Code
+            code={SERVER_USAGE_LOCAL}
+            language="tsx"
+            title="Example with a local image"
+            variant="server"
+          />
 
           <div className={cn("flex flex-col gap-6", "text-white/60")}>
             <div className={cn("space-y-3")}>
@@ -296,31 +374,39 @@ export default function Page() {
               >
                 Parameters
               </h2>
-              <ul className={cn("list-disc space-y-2 pl-6")}>
+              <ul className={cn("list-disc space-y-3 pl-6")}>
                 <li>
-                  <code>imageUrl</code> - URL of the image (required)
+                  <code>imageUrlOrBuffer: string | Buffer</code>
+                  <ul className={cn("mt-3 list-disc pl-6")}>
+                    <li>
+                      The URL of the image or a <code>Buffer</code> containing
+                      image data
+                    </li>
+                  </ul>
                 </li>
                 <li>
-                  <code>options</code>
+                  <code>options?: object</code>
                   <ul className={cn("mt-3 list-disc space-y-2 pl-6")}>
                     <li>
-                      <code>paletteSize</code> - Number of colors to extract
-                      (default: 6, range: 1-12)
+                      <code>paletteSize?: number</code> - Number of colors to
+                      extract (default: 6, range: 1-12)
                     </li>
                     <li>
-                      <code>quality</code> - &quot;low&quot; (200px) |
-                      &quot;medium&quot; (400px) | &quot;high&quot; (800px)
+                      <code>quality?: "low" | "medium" | "high"</code> -
+                      &quot;low&quot; (200px) | &quot;medium&quot; (400px) |
+                      &quot;high&quot; (800px)
                     </li>
                     <li>
-                      <code>timeout</code> - Maximum processing time in ms
-                      (default: 10000)
+                      <code>timeout?: number</code> - Maximum processing time in
+                      milliseconds (default: 10000)
                     </li>
                     <li>
-                      <code>fallbackColors</code> - Custom fallback colors array
+                      <code>fallbackColors?: AuraColor[]</code> - Custom
+                      fallback colors array
                     </li>
                     <li>
-                      <code>validateUrl</code> - Enable URL validation (default:
-                      true)
+                      <code>validateUrl?: boolean</code> - Enable URL validation
+                      (default: true)
                     </li>
                   </ul>
                 </li>
@@ -336,19 +422,10 @@ export default function Page() {
               >
                 Returns
               </h2>
-              <ul className={cn("list-disc space-y-2 pl-6")}>
+              <ul className={cn("list-disc pl-6")}>
                 <li>
-                  <code>Promise&lt;AuraColor[]&gt;</code> - Array of colors,
-                  where each has:
-                  <ul className={cn("mt-3 list-disc space-y-2 pl-6")}>
-                    <li>
-                      <code>hex</code> - Hexadecimal color code (e.g.,
-                      &quot;#FF0000&quot;)
-                    </li>
-                    <li>
-                      <code>weight</code> - Color prevalence (0-1)
-                    </li>
-                  </ul>
+                  <code>Promise&lt;AuraColor[]&gt;</code> - Array of extracted
+                  (or fallback) colors, sorted by weight
                 </li>
               </ul>
             </div>

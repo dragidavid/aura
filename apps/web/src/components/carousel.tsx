@@ -76,7 +76,7 @@ export function Carousel({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
-      className={cn("relative flex size-full overflow-hidden rounded-xl")}
+      className={cn("relative flex size-full overflow-hidden rounded-lg")}
     >
       <ui.In>
         <Background colors={currentColors} />
