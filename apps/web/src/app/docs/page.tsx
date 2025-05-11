@@ -392,8 +392,11 @@ export default function Page() {
                       extract (default: 6, range: 1-12)
                     </li>
                     <li>
-                      <code>quality?: "low" | "medium" | "high"</code> -
-                      &quot;low&quot; (200px) | &quot;medium&quot; (400px) |
+                      <code>
+                        quality?: &quot;low&quot; | &quot;medium&quot; |
+                        &quot;high&quot;
+                      </code>{" "}
+                      - &quot;low&quot; (200px) | &quot;medium&quot; (400px) |
                       &quot;high&quot; (800px)
                     </li>
                     <li>
