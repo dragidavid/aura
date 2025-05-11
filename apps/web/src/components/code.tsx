@@ -16,19 +16,19 @@ const theme = {
     {
       types: ["comment"],
       style: {
-        color: "color-mix(in oklab, var(--color-white) 74%, transparent)",
+        color: "color-mix(in oklab, var(--color-white) 54%, transparent)",
       },
     },
     {
       types: ["atrule", "keyword", "attr-name", "selector", "string"],
       style: {
-        color: "color-mix(in oklab, var(--color-white) 61%, transparent)",
+        color: "color-mix(in oklab, var(--color-white) 71%, transparent)",
       },
     },
     {
       types: ["punctuation", "operator"],
       style: {
-        color: "color-mix(in oklab, var(--color-white) 74%, transparent)",
+        color: "color-mix(in oklab, var(--color-white) 54%, transparent)",
       },
     },
     {
@@ -43,10 +43,18 @@ const theme = {
 type Props = {
   code: string;
   language?: string;
+  title?: string;
+  variant?: "client" | "server";
   className?: string;
 };
 
-export function Code({ code, language = "jsx", className }: Props) {
+export function Code({
+  code,
+  language = "jsx",
+  title,
+  variant,
+  className,
+}: Props) {
   const [copying, setCopying] = useState(0);
 
   const onCopy = useCallback(() => {
@@ -58,65 +66,94 @@ export function Code({ code, language = "jsx", className }: Props) {
     }, 2000);
   }, [code]);
 
+  const variantStyles = {
+    client: {
+      gradient: "from-emerald-400/5",
+      text: "text-emerald-100",
+    },
+    server: {
+      gradient: "from-rose-400/5",
+      text: "text-rose-100",
+    },
+  };
+
   return (
-    <div className={cn("group relative")}>
-      <button
-        onClick={onCopy}
-        aria-label="Copy code"
-        className={cn(
-          "absolute top-3 right-3 z-10 grid size-8 place-items-center rounded-md",
-          "border border-white/10 bg-black/20 opacity-0",
-          "transition-opacity,colors duration-100",
-          "hover:cursor-pointer hover:bg-white/20",
-          "group-hover:opacity-100",
-        )}
-      >
-        {copying ? (
-          <div>
-            <svg
-              viewBox="0 0 24 24"
-              className={cn("size-4", "fill-none stroke-current stroke-2")}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              shapeRendering="geometricPrecision"
-            >
-              <path d="M20 6L9 17l-5-5" />
-            </svg>
-          </div>
-        ) : (
-          <div>
-            <svg
-              viewBox="0 0 24 24"
-              className={cn("size-4", "fill-none stroke-current stroke-2")}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              shapeRendering="geometricPrecision"
-            >
-              <path d="M8 17.929H6c-1.105 0-2-.912-2-2.036V5.036C4 3.91 4.895 3 6 3h8c1.105 0 2 .911 2 2.036v1.866m-6 .17h8c1.105 0 2 .91 2 2.035v10.857C20 21.09 19.105 22 18 22h-8c-1.105 0-2-.911-2-2.036V9.107c0-1.124.895-2.036 2-2.036z" />
-            </svg>
-          </div>
-        )}
-      </button>
-      <Highlight theme={theme} code={code} language={language}>
-        {({ style, tokens, getLineProps, getTokenProps }) => (
-          <pre
-            style={style}
+    <div
+      className={cn(
+        "group relative my-6 rounded-2xl",
+        "bg-white/5 inset-ring inset-ring-white/10",
+        className,
+      )}
+    >
+      <div className={cn("relative p-1")}>
+        {title && (
+          <div
             className={cn(
-              "my-6 overflow-x-scroll rounded-xl p-4",
-              "border border-white/10 bg-radial-[at_-10%_-20%] from-white/10 to-black [background-size:170%_120%]",
-              className,
+              "font px-2 pt-2 pb-2.5 font-serif text-sm font-medium tracking-tight",
+              variant && variantStyles[variant].text,
             )}
           >
-            {tokens.map((line, i) => (
-              <div key={i} {...getLineProps({ line })}>
-                {line.map((token, key) => (
-                  <span key={key} {...getTokenProps({ token })} />
-                ))}
-              </div>
-            ))}
-          </pre>
+            {title}
+          </div>
         )}
-      </Highlight>
+        <button
+          onClick={onCopy}
+          aria-label="Copy code"
+          className={cn(
+            "absolute top-3 right-3 z-10 grid size-8 place-items-center rounded-md",
+            "bg-black/20 opacity-0 ring ring-white/10",
+            "transition-opacity,colors duration-100",
+            "hover:cursor-pointer hover:bg-white/20",
+            "group-hover:opacity-100",
+          )}
+        >
+          {copying ? (
+            <div>
+              <svg
+                viewBox="0 0 24 24"
+                className={cn("size-4", "fill-none stroke-current stroke-2")}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                shapeRendering="geometricPrecision"
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+          ) : (
+            <div>
+              <svg
+                viewBox="0 0 24 24"
+                className={cn("size-4", "fill-none stroke-current stroke-2")}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                shapeRendering="geometricPrecision"
+              >
+                <path d="M8 17.929H6c-1.105 0-2-.912-2-2.036V5.036C4 3.91 4.895 3 6 3h8c1.105 0 2 .911 2 2.036v1.866m-6 .17h8c1.105 0 2 .91 2 2.035v10.857C20 21.09 19.105 22 18 22h-8c-1.105 0-2-.911-2-2.036V9.107c0-1.124.895-2.036 2-2.036z" />
+              </svg>
+            </div>
+          )}
+        </button>
+        <Highlight theme={theme} code={code} language={language}>
+          {({ style, tokens, getLineProps, getTokenProps }) => (
+            <pre
+              style={style}
+              className={cn(
+                "overflow-x-scroll rounded-xl p-4",
+                "bg-radial-[at_-10%_-20%] from-white/10 to-black [background-size:170%_120%] inset-ring inset-ring-white/5",
+                variant && variantStyles[variant].gradient,
+              )}
+            >
+              {tokens.map((line, i) => (
+                <div key={i} {...getLineProps({ line })}>
+                  {line.map((token, key) => (
+                    <span key={key} {...getTokenProps({ token })} />
+                  ))}
+                </div>
+              ))}
+            </pre>
+          )}
+        </Highlight>
+      </div>
     </div>
   );
 }

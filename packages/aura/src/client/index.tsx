@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 
 import { extractColors } from "./extract";
-
 import { DEFAULT_FALLBACK_COLORS } from "../core";
 
 import type { AuraColor, AuraResponse } from "../types";
@@ -17,7 +16,7 @@ import type { AuraColor, AuraResponse } from "../types";
  * @returns Object containing colors, loading state, and error state
  */
 export function useAura(
-  imageUrl: string,
+  imageUrl?: string | null,
   options: {
     paletteSize?: number;
     fallbackColors?: AuraColor[];
@@ -26,12 +25,16 @@ export function useAura(
 ): AuraResponse {
   const [state, setState] = useState<AuraResponse>({
     colors: [],
-    isLoading: true,
+    isLoading: false,
     error: null,
   });
 
-  const paletteSize = options.paletteSize ?? 6;
-  const fallbackColors = options.fallbackColors ?? DEFAULT_FALLBACK_COLORS;
+  const {
+    paletteSize = 6,
+    fallbackColors: optionFallbackColors,
+    onError,
+  } = options;
+  const fallbackColors = optionFallbackColors ?? DEFAULT_FALLBACK_COLORS;
 
   useEffect(() => {
     if (!imageUrl) {
@@ -44,16 +47,31 @@ export function useAura(
       return;
     }
 
+    let currentImageUrl = imageUrl;
+
+    // If it's a relative path, make it absolute.
+    if (
+      typeof window !== "undefined" &&
+      currentImageUrl.startsWith("/") &&
+      !currentImageUrl.startsWith("//")
+    ) {
+      currentImageUrl = `${window.location.origin}${currentImageUrl}`;
+    }
+
     let mounted = true;
     const abortController = new AbortController();
 
-    const getColors = async () => {
-      try {
-        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+    async function processUrl(urlToProcess: string) {
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
+      try {
         const timeoutId = setTimeout(() => {
           if (mounted) {
-            const timeoutError = new Error("Color extraction timed out");
+            abortController.abort();
+
+            const timeoutError = new Error(
+              "[@drgd/aura] - Color extraction timed out"
+            );
 
             setState({
               colors: fallbackColors.slice(0, paletteSize),
@@ -65,7 +83,7 @@ export function useAura(
           }
         }, 10000);
 
-        const result = await extractColors(imageUrl, { paletteSize });
+        const result = await extractColors(urlToProcess, { paletteSize });
 
         clearTimeout(timeoutId);
 
@@ -76,10 +94,10 @@ export function useAura(
             error: null,
           });
         }
-      } catch (err) {
+      } catch (e) {
         if (!mounted) return;
 
-        const error = err instanceof Error ? err : new Error(String(err));
+        const error = e instanceof Error ? e : new Error(String(e));
 
         setState({
           colors: fallbackColors.slice(0, paletteSize),
@@ -89,15 +107,15 @@ export function useAura(
 
         options.onError?.(error);
       }
-    };
+    }
 
-    getColors();
+    processUrl(currentImageUrl);
 
     return () => {
       mounted = false;
       abortController.abort();
     };
-  }, [imageUrl, paletteSize, options.onError, fallbackColors]);
+  }, [imageUrl, paletteSize, onError]);
 
   return state;
 }

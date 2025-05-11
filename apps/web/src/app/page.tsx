@@ -1,43 +1,30 @@
+import fs from "fs";
+import path from "path";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getAura } from "@drgd/aura/server";
-import { getPlaiceholder } from "plaiceholder";
 
 import { Carousel } from "@/components/carousel";
 import { TunnelOut } from "@/components/tunnel-out";
 
 import { cn } from "@/lib/cn";
+import { getRandomImages } from "@/lib/image";
 
-export const dynamic = "force-dynamic";
-
-async function getImages() {
-  const uniqueSeeds = new Set(
-    Array.from({ length: 5 }, () => Math.floor(Math.random() * 1000)),
-  );
-
-  while (uniqueSeeds.size < 5) {
-    uniqueSeeds.add(Math.floor(Math.random() * 1000));
-  }
-
-  return Promise.all(
-    Array.from(uniqueSeeds).map(async (seed) => {
-      const src = `https://picsum.photos/seed/${seed}/600`;
-      const buffer = await fetch(src).then(async (res) =>
-        Buffer.from(await res.arrayBuffer()),
-      );
-      const { base64 } = await getPlaiceholder(buffer);
-
-      return {
-        src,
-        base64,
-      };
-    }),
-  );
-}
-
-async function getColors(images: { src: string; base64: string }[]) {
+async function getColors(images: string[]) {
   const colorsArray = await Promise.all(
-    images.map((image) => getAura(image.src)),
+    images.map(async (image) => {
+      const fsPath = path.join(process.cwd(), "public", image);
+
+      try {
+        const buffer = fs.readFileSync(fsPath);
+
+        return getAura(buffer);
+      } catch (e) {
+        console.error(`[@drgd/aura] - Failed to read image ${image}:`, e);
+
+        return [];
+      }
+    }),
   );
 
   return Object.fromEntries(
@@ -46,7 +33,7 @@ async function getColors(images: { src: string; base64: string }[]) {
 }
 
 async function Images() {
-  const images = await getImages();
+  const images = getRandomImages(5, 30);
   const preloadedColors = await getColors(images);
 
   return <Carousel images={images} preloadedColors={preloadedColors} />;
@@ -79,7 +66,7 @@ export default async function Page() {
             </h1>
           </div>
 
-          <p className="text-white/40">
+          <p className="text-white/60">
             Grab colors from any image.
             <br />
             Works on both server and client.
@@ -134,8 +121,8 @@ export default async function Page() {
       <div className={cn("flex-1 pb-2", "sm:flex-3")}>
         <div
           className={cn(
-            "relative mx-auto h-full max-h-(--container-lg) max-w-md overflow-hidden rounded-2xl p-2",
-            "border border-white/10 bg-black/20 shadow-lg backdrop-blur-md",
+            "relative mx-auto h-full max-h-(--container-lg) max-w-md overflow-hidden rounded-xl p-1",
+            "bg-white/5 inset-ring inset-ring-white/10",
           )}
         >
           <Suspense

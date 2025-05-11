@@ -1,11 +1,5 @@
-import withPlaiceholder from "@plaiceholder/next";
-
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  images: {
-    remotePatterns: [{ hostname: "picsum.photos" }],
-  },
-};
+const nextConfig: NextConfig = {};
 
-export default withPlaiceholder(nextConfig);
+export default nextConfig;

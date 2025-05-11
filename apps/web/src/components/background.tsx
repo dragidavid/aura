@@ -269,8 +269,8 @@ export function Background({ colors }: { colors: AuraColor[] }) {
         className={cn(
           "fixed inset-0 -z-10",
           "pointer-events-none",
-          "bg-radial from-black/5 to-black/30",
-          "sm:from-black/20 sm:to-black/60",
+          "bg-radial from-black/5 to-black/20",
+          "sm:from-black/20 sm:to-black/40",
         )}
       />
     </Suspense>

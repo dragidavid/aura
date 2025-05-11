@@ -61,7 +61,7 @@ function createMockSharpOutput(width = 10, height = 10, channels = 3) {
   };
 }
 
-describe("getAura (Server Extract)", () => {
+describe("getAura", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(core.validateImageUrl).mockResolvedValue(true);
@@ -95,6 +95,26 @@ describe("getAura (Server Extract)", () => {
     expect(colors).toBeInstanceOf(Array);
     expect(colors.length).toBeGreaterThan(0);
     expect(colors.length).toBeLessThanOrEqual(6);
+    expect(colors[0]).toHaveProperty("hex");
+    expect(colors[0]).toHaveProperty("weight");
+  });
+
+  it("should process a valid Buffer input without calling validateImageUrl", async () => {
+    const mockImageBuffer = Buffer.from("dummy-buffer-data");
+    const mockSharpOutput = createMockSharpOutput(30, 30);
+
+    mockSharpInstance.metadata.mockResolvedValueOnce({ width: 30, height: 30 });
+    mockSharpInstance.toBuffer.mockResolvedValueOnce(mockSharpOutput);
+
+    const colors = await getAura(mockImageBuffer);
+
+    expect(core.validateImageUrl).not.toHaveBeenCalled();
+    expect(mockFetch).not.toHaveBeenCalled(); // Should not fetch for buffer input
+    expect(sharp).toHaveBeenCalledWith(mockImageBuffer);
+    expect(mockSharpInstance.toBuffer).toHaveBeenCalledOnce();
+    expect(colors).toBeInstanceOf(Array);
+    expect(colors.length).toBeGreaterThan(0);
+    // Further assertions as in the valid URL test
     expect(colors[0]).toHaveProperty("hex");
     expect(colors[0]).toHaveProperty("weight");
   });

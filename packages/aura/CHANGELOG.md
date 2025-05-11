@@ -4,7 +4,9 @@
 
 ### Patch Changes
 
-- b0346a4: #### Bug Fixes
+- b0346a4: Bug Fixes
+
+  ##### Bug Fixes
 
   - fix image link in aura readme
 

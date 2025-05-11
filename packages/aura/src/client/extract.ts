@@ -39,12 +39,12 @@ export async function extractColors(
     validateUrl?: boolean;
   } = {}
 ): Promise<AuraColor[]> {
-  if (!imageUrl) throw new Error("Image URL is required");
+  if (!imageUrl) throw new Error("[@drgd/aura] - Image URL is required");
 
   const paletteSize = options.paletteSize ?? 6;
 
   if (paletteSize < 1 || paletteSize > 12) {
-    throw new Error("Number of colors must be between 1 and 12");
+    throw new Error("[@drgd/aura] - Number of colors must be between 1 and 12");
   }
 
   if (options.validateUrl !== false) {
@@ -53,10 +53,10 @@ export async function extractColors(
 
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
-
     img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
-    img.onerror = (e) => reject(new Error(`Failed to load image: ${e}`));
+    img.onerror = (e) =>
+      reject(new Error(`[@drgd/aura] - Failed to load image: ${e.toString()}`));
     img.src = imageUrl;
   });
 
@@ -70,7 +70,7 @@ export async function extractColors(
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-  if (!ctx) throw new Error("Could not get canvas context");
+  if (!ctx) throw new Error("[@drgd/aura] - Could not get canvas context");
 
   canvas.width = width;
   canvas.height = height;
