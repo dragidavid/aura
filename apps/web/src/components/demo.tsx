@@ -40,12 +40,10 @@ export function Demo() {
     }
   };
 
-  console.log(isLoading);
-
   return (
     <div
       className={cn(
-        "mt-5 flex flex-col gap-3 overflow-hidden rounded-xl p-3 text-sm",
+        "mt-5 flex flex-col gap-4 overflow-hidden rounded-xl p-3 text-sm",
         "border border-white/10 text-white",
       )}
     >
@@ -112,8 +110,8 @@ export function Demo() {
           {error ? (
             <div
               className={cn(
-                "grid h-full min-h-12 place-items-center font-serif font-medium tracking-tight",
-                "text-red-500",
+                "grid h-full min-h-12 place-items-center rounded-xl font-serif font-medium tracking-tight",
+                "bg-red-500/10 text-red-500",
               )}
             >
               <span>error getting colors</span>

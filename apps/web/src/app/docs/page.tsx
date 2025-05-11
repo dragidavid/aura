@@ -7,11 +7,13 @@ import { siteConfig } from "@/config/site";
 
 import type { Metadata } from "next";
 
-const BASIC_USAGE_CLIENT = `import { useAura } from "@drgd/aura/client";
+const BASIC_USAGE_CLIENT = `"use client";
 
-export function Colors() {
-  const { colors, isLoading, error } = useAura("https://picsum.photos/200", {
-    paletteSize: 6,
+import { useAura } from "@drgd/aura/client";
+
+export function Colors({ imageUrl }: { imageUrl: string }) {
+  const { colors, isLoading, error } = useAura(imageUrl, {
+    paletteSize: 4,
     onError: (error) => console.error(error)
   });
 
@@ -34,8 +36,7 @@ const BASIC_USAGE_SERVER = `import { getAura } from "@drgd/aura/server";
 import { Suspense } from "react";
 
 // Server Component that gets the colors
-async function Colors({ imageUrl }) {
-  // Fetches colors server-side. Returns fallbacks on error.
+async function Colors({ imageUrl }: { imageUrl: string }) {
   const colors = await getAura(imageUrl, {
     paletteSize: 8, // Optional: Specify number of colors (1-12, default: 6)
     // quality: 'high', // Optional: 'low' (200px), 'medium' (400px), 'high' (800px)
@@ -47,8 +48,8 @@ async function Colors({ imageUrl }) {
   return (
     <ul>
       {colors.map((color) => (
-        <li key={color.hex} style={{ color: color.hex }}>
-          {color.hex} ({Math.round(color.weight * 100)}%)
+        <li key={color.hex} style={{ backgroundColor: color.hex }}>
+          {color.hex} - {Math.round(color.weight * 100)}%
         </li>
       ))}
     </ul>
@@ -109,7 +110,7 @@ function SectionBadge({ variant, children }: SectionBadgeProps) {
   return (
     <div
       className={cn(
-        "text-2xs absolute -top-2.5 rounded-full px-1.5 py-0.5 font-mono font-bold uppercase",
+        "text-2xs absolute -top-2.5 rounded-full px-2 py-0.5 font-mono font-bold uppercase",
         variantStyles[variant],
       )}
     >
@@ -158,7 +159,7 @@ export default function Page() {
           className={cn(
             "relative -mx-8 rounded-2xl px-8 pt-2 pb-6",
             "border border-dashed border-emerald-500/40 bg-emerald-500/5",
-            "sm:pb-8",
+            "sm:border-2 sm:pb-8",
           )}
         >
           <SectionBadge variant="client">client</SectionBadge>
@@ -183,24 +184,24 @@ export default function Page() {
                   "text-white",
                 )}
               >
-                Parameters:
+                Parameters
               </h2>
               <ul className={cn("list-disc space-y-2 pl-6")}>
                 <li>
-                  <code>imageUrl</code>: URL of the image (required)
+                  <code>imageUrl</code> - URL of the image (required)
                 </li>
                 <li>
-                  <code>options</code>:
+                  <code>options</code>
                   <ul className={cn("mt-3 list-disc space-y-2 pl-6")}>
                     <li>
-                      <code>paletteSize</code>: Number of colors to extract
+                      <code>paletteSize</code> - Number of colors to extract
                       (default: 6, range: 1-12)
                     </li>
                     <li>
-                      <code>fallbackColors</code>: Custom fallback colors array
+                      <code>fallbackColors</code> - Custom fallback colors array
                     </li>
                     <li>
-                      <code>onError</code>: Error callback function
+                      <code>onError</code> - Error callback function
                     </li>
                   </ul>
                 </li>
@@ -214,17 +215,17 @@ export default function Page() {
                   "text-white",
                 )}
               >
-                Returns:
+                Returns
               </h2>
               <ul className={cn("list-disc space-y-2 pl-6")}>
                 <li>
-                  <code>colors</code>: Array of <code>AuraColor</code> objects
+                  <code>colors</code> - Array of <code>AuraColor</code> objects
                 </li>
                 <li>
-                  <code>isLoading</code>: Boolean indicating extraction status
+                  <code>isLoading</code> - Boolean indicating extraction status
                 </li>
                 <li>
-                  <code>error</code>: Error object if failed, <code>null</code>{" "}
+                  <code>error</code> - Error object if failed, <code>null</code>{" "}
                   otherwise
                 </li>
               </ul>
@@ -250,7 +251,7 @@ export default function Page() {
           className={cn(
             "relative -mx-8 rounded-2xl px-8 pt-2 pb-6",
             "border border-dashed border-rose-400/30 bg-rose-500/5",
-            "sm:pb-8",
+            "sm:border-2 sm:pb-8",
           )}
         >
           <SectionBadge variant="server">server</SectionBadge>
@@ -261,20 +262,27 @@ export default function Page() {
             Usage
           </h1>
 
-          <p className="text-white/60">
-            Use the <code>getAura</code> function inside an async Server
-            Component. To prevent blocking the initial page load while colors
-            are extracted, wrap the component calling the function in{" "}
-            <code>&lt;Suspense&gt;</code>. Uses{" "}
-            <a
-              href="https://github.com/lovell/sharp"
-              target="_blank"
-              className={cn("underline underline-offset-2", "text-white")}
-            >
-              sharp ↗
-            </a>
-            .
-          </p>
+          <div className={cn("space-y-3", "text-white/60")}>
+            <p>
+              Use the <code>getAura</code> function inside an async Server
+              Component. To prevent blocking the initial page load while colors
+              are extracted, wrap <code>getAura</code> call in{" "}
+              <code>&lt;Suspense&gt;</code>.
+            </p>
+
+            <p>
+              We use <code>sharp</code> under the hood to process the image.
+              Check out the{" "}
+              <a
+                href="https://github.com/lovell/sharp"
+                target="_blank"
+                className={cn("underline underline-offset-2", "text-white")}
+              >
+                sharp ↗
+              </a>{" "}
+              documentation for more information.
+            </p>
+          </div>
 
           <Code code={BASIC_USAGE_SERVER} />
 
@@ -286,32 +294,32 @@ export default function Page() {
                   "text-white",
                 )}
               >
-                Parameters:
+                Parameters
               </h2>
               <ul className={cn("list-disc space-y-2 pl-6")}>
                 <li>
-                  <code>imageUrl</code>: URL of the image (required)
+                  <code>imageUrl</code> - URL of the image (required)
                 </li>
                 <li>
-                  <code>options</code>:
+                  <code>options</code>
                   <ul className={cn("mt-3 list-disc space-y-2 pl-6")}>
                     <li>
-                      <code>paletteSize</code>: Number of colors to extract
+                      <code>paletteSize</code> - Number of colors to extract
                       (default: 6, range: 1-12)
                     </li>
                     <li>
-                      <code>quality</code>: &quot;low&quot; (200px) |
+                      <code>quality</code> - &quot;low&quot; (200px) |
                       &quot;medium&quot; (400px) | &quot;high&quot; (800px)
                     </li>
                     <li>
-                      <code>timeout</code>: Maximum processing time in ms
+                      <code>timeout</code> - Maximum processing time in ms
                       (default: 10000)
                     </li>
                     <li>
-                      <code>fallbackColors</code>: Custom fallback colors array
+                      <code>fallbackColors</code> - Custom fallback colors array
                     </li>
                     <li>
-                      <code>validateUrl</code>: Enable URL validation (default:
+                      <code>validateUrl</code> - Enable URL validation (default:
                       true)
                     </li>
                   </ul>
@@ -326,19 +334,19 @@ export default function Page() {
                   "text-white",
                 )}
               >
-                Returns:
+                Returns
               </h2>
               <ul className={cn("list-disc space-y-2 pl-6")}>
                 <li>
-                  <code>Promise&lt;AuraColor[]&gt;</code>: Array of colors,
+                  <code>Promise&lt;AuraColor[]&gt;</code> - Array of colors,
                   where each has:
                   <ul className={cn("mt-3 list-disc space-y-2 pl-6")}>
                     <li>
-                      <code>hex</code>: Hexadecimal color code (e.g.,
+                      <code>hex</code> - Hexadecimal color code (e.g.,
                       &quot;#FF0000&quot;)
                     </li>
                     <li>
-                      <code>weight</code>: Color prevalence (0-1)
+                      <code>weight</code> - Color prevalence (0-1)
                     </li>
                   </ul>
                 </li>
