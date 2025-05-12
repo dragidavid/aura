@@ -10,6 +10,8 @@ import { TunnelOut } from "@/components/tunnel-out";
 import { cn } from "@/lib/cn";
 import { getRandomImages } from "@/lib/image";
 
+export const dynamic = "force-dynamic";
+
 async function getColors(images: string[]) {
   const colorsArray = await Promise.all(
     images.map(async (image) => {
