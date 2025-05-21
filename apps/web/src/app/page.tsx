@@ -56,7 +56,7 @@ export default async function Page() {
             className={cn(
               "relative w-fit rounded-full px-6 pb-1",
               "select-none",
-              "bg-black/20",
+              "bg-black/20 mix-blend-color-dodge backdrop-brightness-125 backdrop-saturate-200",
             )}
           >
             <h1
@@ -81,7 +81,7 @@ export default async function Page() {
               className={cn(
                 "rounded-full px-6 py-2",
                 "transition-colors duration-100",
-                "border border-white bg-black/10",
+                "border border-white bg-black/20",
                 "group-hover:bg-white/20",
               )}
             >
@@ -93,7 +93,7 @@ export default async function Page() {
               className={cn(
                 "relative grid size-[43px] place-items-center rounded-full",
                 "transition-colors duration-100",
-                "border border-white bg-black/10",
+                "border border-white bg-black/20",
                 "group-hover:bg-white/20",
               )}
             >

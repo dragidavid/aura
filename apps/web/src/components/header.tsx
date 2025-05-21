@@ -18,7 +18,7 @@ export async function Header() {
           href="/"
           aria-label="main logo"
           className={cn(
-            "group relative grid size-8 place-items-center rounded-full",
+            "group relative grid size-8 rounded-full",
             "select-none",
           )}
         >
@@ -26,9 +26,9 @@ export async function Header() {
             <div
               key={index}
               className={cn(
-                "absolute rounded-full",
+                "absolute place-self-center rounded-full",
                 "transition-colors duration-100",
-                "bg-white/10",
+                "bg-white/10 inset-ring inset-ring-white/10",
                 "group-hover:bg-white/20",
               )}
               style={{

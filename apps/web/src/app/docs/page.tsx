@@ -238,10 +238,14 @@ export default function Page() {
               >
                 Parameters
               </h2>
-              <ul className={cn("list-disc space-y-3 pl-6")}>
+              <ul className={cn("list-disc space-y-3 pl-6 leading-relaxed")}>
                 <li>
                   <code>imageUrl?: string | null</code>
-                  <ul className={cn("mt-3 list-disc space-y-2 pl-6")}>
+                  <ul
+                    className={cn(
+                      "mt-3 list-disc space-y-2 pl-6 leading-relaxed",
+                    )}
+                  >
                     <li>URL of the image or a local static path</li>
                     <li>
                       Uses default <code>fallbackColors</code> if not provided
@@ -250,7 +254,11 @@ export default function Page() {
                 </li>
                 <li>
                   <code>options?: object</code>
-                  <ul className={cn("mt-3 list-disc space-y-2 pl-6")}>
+                  <ul
+                    className={cn(
+                      "mt-3 list-disc space-y-2 pl-6 leading-relaxed",
+                    )}
+                  >
                     <li>
                       <code>paletteSize?: number</code> - Number of colors to
                       extract (default: 6, range: 1-12)
@@ -277,7 +285,7 @@ export default function Page() {
               >
                 Returns
               </h2>
-              <ul className={cn("list-disc space-y-2 pl-6")}>
+              <ul className={cn("list-disc space-y-2 pl-6 leading-relaxed")}>
                 <li>
                   <code>colors: AuraColor[]</code> - Array of extracted (or
                   fallback) colors, sorted by weight
@@ -374,10 +382,10 @@ export default function Page() {
               >
                 Parameters
               </h2>
-              <ul className={cn("list-disc space-y-3 pl-6")}>
+              <ul className={cn("list-disc space-y-3 pl-6 leading-relaxed")}>
                 <li>
                   <code>imageUrlOrBuffer: string | Buffer</code>
-                  <ul className={cn("mt-3 list-disc pl-6")}>
+                  <ul className={cn("mt-3 list-disc pl-6 leading-relaxed")}>
                     <li>
                       The URL of the image or a <code>Buffer</code> containing
                       image data
@@ -386,7 +394,11 @@ export default function Page() {
                 </li>
                 <li>
                   <code>options?: object</code>
-                  <ul className={cn("mt-3 list-disc space-y-2 pl-6")}>
+                  <ul
+                    className={cn(
+                      "mt-3 list-disc space-y-2 pl-6 leading-relaxed",
+                    )}
+                  >
                     <li>
                       <code>paletteSize?: number</code> - Number of colors to
                       extract (default: 6, range: 1-12)
@@ -425,7 +437,7 @@ export default function Page() {
               >
                 Returns
               </h2>
-              <ul className={cn("list-disc pl-6")}>
+              <ul className={cn("list-disc pl-6 leading-relaxed")}>
                 <li>
                   <code>Promise&lt;AuraColor[]&gt;</code> - Array of extracted
                   (or fallback) colors, sorted by weight
@@ -447,7 +459,7 @@ export default function Page() {
               Both implementations include built-in error handling with fallback
               colors:
             </p>
-            <ul className={cn("list-disc space-y-2 pl-6")}>
+            <ul className={cn("list-disc space-y-2 pl-6 leading-relaxed")}>
               <li>Invalid image URLs</li>
               <li>Network errors</li>
               <li>Timeout errors (10s default)</li>

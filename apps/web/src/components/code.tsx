@@ -93,18 +93,21 @@ export function Code({
               variant && variantStyles[variant].text,
             )}
           >
-            {title}
+            <span>{title}</span>
           </div>
         )}
+
         <button
           onClick={onCopy}
           aria-label="Copy code"
           className={cn(
-            "absolute top-3 right-3 z-10 grid size-8 place-items-center rounded-md",
-            "bg-black/20 opacity-0 ring ring-white/10",
+            "absolute top-[15px] right-[15px] z-10 grid size-8 place-items-center rounded-md",
             "transition-opacity,colors duration-100",
+            "bg-black/20 ring ring-white/10 backdrop-blur-md",
             "hover:cursor-pointer hover:bg-white/20",
             "group-hover:opacity-100",
+            "sm:opacity-0",
+            title && "top-[54px] right-[15px]",
           )}
         >
           {copying ? (
@@ -133,6 +136,7 @@ export function Code({
             </div>
           )}
         </button>
+
         <Highlight theme={theme} code={code} language={language}>
           {({ style, tokens, getLineProps, getTokenProps }) => (
             <pre

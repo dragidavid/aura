@@ -110,8 +110,8 @@ export function Carousel({
         aria-label="Previous image"
         className={cn(
           "absolute top-1/2 left-4 z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full",
-          "border border-white/10 bg-black/20",
           "transition-colors duration-100",
+          "border border-white/10 bg-black/20",
           "hover:cursor-w-resize hover:bg-white/20",
           "sm:grid",
         )}
@@ -134,8 +134,8 @@ export function Carousel({
         aria-label="Next image"
         className={cn(
           "absolute top-1/2 right-4 z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full",
-          "border border-white/10 bg-black/20",
           "transition-colors duration-100",
+          "border border-white/10 bg-black/20",
           "hover:cursor-e-resize hover:bg-white/20",
           "sm:grid",
         )}

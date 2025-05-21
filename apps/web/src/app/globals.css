@@ -1,32 +1,18 @@
 @import "tailwindcss";
 
 @theme {
+  --text-2xs: 0.625rem;
+}
+
+@theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-noto-serif);
   --font-serif-display: var(--font-noto-serif-display);
-
-  --text-2xs: 0.625rem;
 }
 
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
 @layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
-
   code {
-    @apply mx-0.5 rounded-md bg-white/10 px-2 py-[3px] text-sm font-medium text-white inset-ring inset-ring-white/10;
+    @apply mx-0.5 rounded-md bg-white/5 px-2 py-[2.5px] text-sm font-medium text-white inset-ring inset-ring-white/10;
   }
 }
