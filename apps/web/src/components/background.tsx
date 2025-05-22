@@ -260,8 +260,8 @@ export function Background({ colors }: { colors: AuraColor[] }) {
         className={cn(
           "fixed inset-0 -z-10",
           "pointer-events-none",
-          "backdrop-blur-2xl backdrop-brightness-110 backdrop-saturate-200",
-          "sm:backdrop-blur-3xl",
+          "backdrop-blur-2xl backdrop-brightness-125 backdrop-saturate-200",
+          "sm:backdrop-blur-[124px]",
         )}
       />
 
@@ -270,7 +270,7 @@ export function Background({ colors }: { colors: AuraColor[] }) {
           "fixed inset-0 -z-10",
           "pointer-events-none",
           "bg-radial from-black/5 to-black/20",
-          "sm:from-black/20 sm:to-black/40",
+          "sm:from-transparent sm:to-black/80",
         )}
       />
     </Suspense>

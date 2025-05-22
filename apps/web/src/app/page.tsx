@@ -49,6 +49,7 @@ export default async function Page() {
       <div
         className={cn(
           "flex flex-1 flex-col items-center justify-center gap-12 py-8 text-center",
+          "sm:pt-24 sm:pb-0",
         )}
       >
         <div className={cn("flex flex-col items-center gap-6")}>
@@ -56,12 +57,13 @@ export default async function Page() {
             className={cn(
               "relative w-fit rounded-full px-6 pb-1",
               "select-none",
-              "bg-black/20 mix-blend-color-dodge backdrop-brightness-125 backdrop-saturate-200",
+              "bg-black/20 backdrop-brightness-150 backdrop-saturate-200",
             )}
           >
             <h1
               className={cn(
                 "font-serif-display text-2xl font-semibold tracking-tighter",
+                "mix-blend-color-dodge",
               )}
             >
               aura
@@ -120,10 +122,10 @@ export default async function Page() {
         </div>
       </div>
 
-      <div className={cn("flex-1 pb-2", "sm:flex-3")}>
+      <div className={cn("flex-1 pb-2", "sm:flex-3 sm:pt-24")}>
         <div
           className={cn(
-            "relative mx-auto h-full max-h-(--container-lg) max-w-md overflow-hidden rounded-xl p-1",
+            "relative mx-auto h-full max-h-(--container-md) max-w-md overflow-hidden rounded-xl p-1",
             "bg-white/5 inset-ring inset-ring-white/10",
           )}
         >
